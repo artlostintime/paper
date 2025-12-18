@@ -75,7 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function checkAuth() {
     try {
-      const res = await fetch("/api/auth/check");
+      const res = await fetch("/api/auth/check", {
+        credentials: "same-origin",
+      });
       const data = await res.json();
       console.log("Auth check:", data);
       if (data.authenticated === true) {
@@ -111,6 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
           body: JSON.stringify({ password }),
         });
         const data = await res.json();
@@ -156,7 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       try {
-        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "same-origin",
+        });
       } catch (e) {}
       showLoginScreen();
       showToast("Logged out successfully", "success");
@@ -167,7 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadPapers() {
     console.log("Loading papers...");
     try {
-      const res = await fetch("/api/papers");
+      const res = await fetch("/api/papers", {
+        credentials: "same-origin",
+      });
       const data = await res.json();
       console.log("Papers response:", data);
 
@@ -271,7 +279,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Loading paper:", filename);
     try {
-      const res = await fetch(`/api/papers/${encodeURIComponent(filename)}`);
+      const res = await fetch(`/api/papers/${encodeURIComponent(filename)}`, {
+        credentials: "same-origin",
+      });
       if (!res.ok) throw new Error("Failed to load");
       const data = await res.json();
       const content = data.content || "";
@@ -311,6 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/papers/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ filename: finalFilename, content }),
       });
 
@@ -330,7 +341,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function duplicatePaper(filename) {
     try {
-      const res = await fetch(`/api/papers/${encodeURIComponent(filename)}`);
+      const res = await fetch(`/api/papers/${encodeURIComponent(filename)}`, {
+        credentials: "same-origin",
+      });
       if (!res.ok) throw new Error("Failed to load");
       const data = await res.json();
       const content = data.content || "";
@@ -355,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch("/api/papers/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ filename }),
       });
 

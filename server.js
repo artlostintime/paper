@@ -155,8 +155,9 @@ const server = http.createServer(async (req, res) => {
     `http://127.0.0.1:${PORT}`,
   ];
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
   }
   res.setHeader(
     "Access-Control-Allow-Methods",
