@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vishu | Psychology & Systems</title>
+    <meta
+      name="description"
+      content="Psychology research portfolio by Vishu - exploring burnout, cognition, and clinical psychology through mixed-methods research."
+    />
+    <meta property="og:title" content="Vishu | Psychology & Systems" />
+    <meta
+      property="og:description"
+      content="Research papers on burnout, cognition, and clinical psychology"
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Vishu | Psychology & Systems" />
+    <meta
+      name="twitter:description"
+      content="Psychology research portfolio - papers on burnout, cognition, and clinical psychology"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
+    <!-- KaTeX -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    ></script>
+
+    <!-- Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Page Load Animation - Inline critical CSS -->
+    <style>
+      .page-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-body, #1a1a1b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        transition: opacity 0.5s, visibility 0.5s;
+      }
+      .page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .loader-content {
+        text-align: center;
+      }
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid var(--line, #333);
+        border-top-color: var(--accent, #b74b4b);
+        border-radius: 50%;
+        animation: loaderSpin 0.8s linear infinite;
+      }
+      .loader-text {
+        margin-top: 1rem;
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+        color: var(--text-muted, #888);
+      }
+      @keyframes loaderSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">Loading...</p>
+      </div>
+    </div>
+
+    <button id="menu-toggle" class="menu-btn" aria-label="Open Navigation">
+      <i class="fas fa-bars"></i>
+      <span>Menu</span>
+    </button>
+
+    <div id="overlay" class="panel-overlay"></div>
+
+    <nav id="side-panel" class="side-panel">
+      <button id="close-btn" class="close-btn" aria-label="Close Navigation">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="panel-header">
+        <h1>Vishu</h1>
+        <p class="role">Psychology & Systems</p>
+      </div>
+
+      <ul class="panel-links">
+        <li><a href="#intro" class="nav-link">01. Introduction</a></li>
+        <li><a href="#papers" class="nav-link">02. Papers & Notes</a></li>
+        <li><a href="#timeline" class="nav-link">03. Timeline</a></li>
+        <li><a href="#technical" class="nav-link">04. Technical</a></li>
+        <li><a href="#contact" class="nav-link">05. Correspondence</a></li>
+      </ul>
+
+      <div class="panel-footer">
+        <button id="theme-toggle" class="theme-btn-outlined">
+          <i class="fas fa-sun" id="theme-icon"></i>
+          <span id="theme-text">Light Mode</span>
+        </button>
+      </div>
+    </nav>
+
+    <main id="main-content">
+      <section id="intro" class="chapter">
+        <span class="chapter-number">Chapter 01</span>
+        <h2 class="chapter-title">Introduction</h2>
+        <p class="lead-text">
+          I am a psychology researcher based in Delhi, India, bridging the gap
+          between clinical frameworks and technical systems.
+        </p>
+        <p>
+          My work currently explores burnout in helping professions through
+          mixed-methods research, while maintaining a parallel practice in
+          systems programming using Rust and Linux.
+        </p>
+      </section>
+
+      <hr class="section-divider" />
+
+      <section id="papers" class="chapter">
+        <span class="chapter-number">Chapter 02</span>
+        <h2 class="chapter-title">Papers & Notes</h2>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            type="text"
+            id="search-papers"
+            placeholder="Search papers..."
+            aria-label="Search papers"
+          />
+          <button id="clear-search" class="clear-search" style="display: none">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-filter" id="category-filter">
+          <button class="filter-btn active" data-category="all">
+            <i class="fas fa-layer-group"></i> All
+          </button>
+          <!-- More buttons will be added dynamically -->
+        </div>
+
+        <!-- Paper Count -->
+        <p id="paper-count" class="paper-count"></p>
+
+        <!-- Skeleton Loader -->
+        <div id="skeleton-loader" class="skeleton-container">
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-meta"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-meta"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
+        </div>
+
+        <div id="papers-container"></div>
+
+        <!-- No Results Message -->
+        <p id="no-results" class="no-results" style="display: none">
+          No papers found matching your search.
+        </p>
+
+        <div id="papers-controls" class="papers-controls">
+          <button id="view-more-btn" class="btn-text">View More &rarr;</button>
+          <div
+            id="pagination"
+            class="pagination-container"
+            style="display: none"
+          ></div>
+        </div>
+      </section>
+
+      <hr class="section-divider" />
+
+      <section id="timeline" class="chapter">
+        <span class="chapter-number">Chapter 03</span>
+        <h2 class="chapter-title">Timeline</h2>
+        <div class="timeline-wrapper">
+          <div class="timeline-container" id="timeline-container">
+            <ul class="timeline-list">
+              <li>
+                <span class="year">2024</span>
+                <p>Initiated burnout research protocol</p>
+              </li>
+              <li>
+                <span class="year">2023</span>
+                <p>Published co-authored work on panic disorder</p>
+              </li>
+              <li>
+                <span class="year">2022</span>
+                <p>Completed BA Psychology, University of Delhi</p>
+              </li>
+              <li>
+                <span class="year">2021</span>
+                <p>Research internship at AIIMS Delhi</p>
+              </li>
+              <li>
+                <span class="year">2020</span>
+                <p>Started undergraduate studies</p>
+              </li>
+              <li>
+                <span class="year">2019</span>
+                <p>First exposure to clinical psychology</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p class="timeline-hint" id="timeline-hint">
+          <i class="fas fa-hand-pointer"></i> Click & drag to scroll
+        </p>
+      </section>
+
+      <hr class="section-divider" />
+
+      <section id="technical" class="chapter">
+        <span class="chapter-number">Chapter 04</span>
+        <h2 class="chapter-title">Technical</h2>
+        <p>
+          Beyond psychology, I maintain an active practice in systems-level
+          programming.
+        </p>
+
+        <div class="tech-grid">
+          <div class="tech-category">
+            <span class="tech-label">Languages</span>
+            <div class="tech-tags">
+              <span class="tech-tag">Rust</span>
+              <span class="tech-tag">Python</span>
+              <span class="tech-tag">C</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-label">Systems</span>
+            <div class="tech-tags">
+              <span class="tech-tag">Linux</span>
+              <span class="tech-tag">NixOS</span>
+            </div>
+          </div>
+          <div class="tech-category">
+            <span class="tech-label">Tools</span>
+            <div class="tech-tags">
+              <span class="tech-tag">Neovim</span>
+              <span class="tech-tag">LaTeX</span>
+              <span class="tech-tag">Git</span>
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="https://github.com/yourusername"
+          target="_blank"
+          class="github-link"
+        >
+          <i class="fab fa-github"></i> View on GitHub
+        </a>
+      </section>
+
+      <hr class="section-divider" />
+
+      <section id="contact" class="chapter">
+        <span class="chapter-number">Chapter 05</span>
+        <h2 class="chapter-title">Correspondence</h2>
+
+        <div class="contact-wrapper">
+          <div class="availability-badge">
+            <span class="status-dot"></span>
+            <span>Open to Collaborations</span>
+          </div>
+
+          <p class="section-intro">
+            For academic inquiries, research collaborations, or technical
+            projects, feel free to reach out.
+          </p>
+
+          <div class="email-box">
+            <i class="fas fa-envelope"></i>
+            <span class="email-text">vsingh6.23@stu.aud.ac.in </span>
+            <button id="copy-email" class="copy-btn" title="Copy email">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+
+          <div class="social-links">
+            <a
+              href="https://github.com/yourusername"
+              target="_blank"
+              class="social-icon"
+              title="GitHub"
+            >
+              <i class="fab fa-github"></i>
+            </a>
+            <a
+              href="https://linkedin.com/in/yourusername"
+              target="_blank"
+              class="social-icon"
+              title="LinkedIn"
+            >
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a
+              href="https://twitter.com/yourusername"
+              target="_blank"
+              class="social-icon"
+              title="Twitter"
+            >
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a
+              href="https://orcid.org/0000-0000-0000-0000"
+              target="_blank"
+              class="social-icon"
+              title="ORCID"
+            >
+              <i class="fab fa-orcid"></i>
+            </a>
+          </div>
+
+          <div class="contact-info">
+            <div class="info-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Delhi, India</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <span>UTC+5:30 (IST)</span>
+            </div>
+          </div>
+
+          <p class="response-note">
+            <i class="fas fa-reply"></i>
+            Typically responds within 24-48 hours
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+  </body>
+</html>
