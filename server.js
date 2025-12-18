@@ -149,10 +149,26 @@ const server = http.createServer(async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
-  // CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  // CORS headers - restricted to localhost
+  const allowedOrigins = [
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:${PORT}`,
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // Security headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -364,7 +380,22 @@ const server = http.createServer(async (req, res) => {
         res.end(`Server Error: ${err.code}`);
       }
     } else {
-      res.writeHead(200, { "Content-Type": contentType });
+      // Add caching headers for static assets
+      const cacheableTypes = [
+        ".css",
+        ".js",
+        ".png",
+        ".jpg",
+        ".svg",
+        ".ico",
+        ".woff",
+        ".woff2",
+      ];
+      const headers = { "Content-Type": contentType };
+      if (cacheableTypes.includes(ext)) {
+        headers["Cache-Control"] = "public, max-age=86400"; // 1 day
+      }
+      res.writeHead(200, headers);
       res.end(content);
     }
   });

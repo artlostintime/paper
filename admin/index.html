@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel | Portfolio</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Fira+Code&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+
+    <!-- All styles are inline below - external style.css removed to prevent conflicts -->
+    <style>
+      :root {
+        --bg-body: #1c1b1a;
+        --bg-card: #252422;
+        --bg-input: #1a1918;
+        --text-main: #e8e4df;
+        --text-muted: #9a9590;
+        --text-light: #b8b2aa;
+        --accent: #c9785d;
+        --accent-hover: #e08b6d;
+        --line: #3a3836;
+        --line-light: #2d2b29;
+        --success: #7fa86f;
+        --danger: #c75d5d;
+        --warning: #d4a855;
+        --info: #5d9dc9;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg-body);
+        color: var(--text-main);
+        font-family: "Inter", sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* Login */
+      .login-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-body);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .login-screen.hidden {
+        display: none;
+      }
+      .login-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 380px;
+      }
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .login-header i {
+        font-size: 3rem;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        display: block;
+      }
+      .login-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .login-header p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .login-input-group {
+        position: relative;
+        margin-bottom: 1rem;
+      }
+      .login-input-group > i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+      .login-input-group input {
+        width: 100%;
+        background: var(--bg-input);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 45px 14px 42px;
+        color: var(--text-main);
+        font-size: 1rem;
+      }
+      .login-input-group input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 5px 8px;
+      }
+      .login-error {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        min-height: 1.2em;
+        text-align: center;
+      }
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .login-btn:hover {
+        background: var(--accent-hover);
+      }
+      .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--line);
+      }
+      .login-footer a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.85rem;
+      }
+      .login-footer a:hover {
+        color: var(--accent);
+      }
+
+      /* Buttons */
+      .btn {
+        font-family: inherit;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        text-decoration: none;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .btn-primary:hover {
+        background: var(--accent-hover);
+        border-color: var(--accent-hover);
+      }
+      .btn-secondary {
+        background: var(--bg-card);
+        color: var(--text-main);
+        border-color: var(--line);
+      }
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-danger {
+        background: transparent;
+        color: var(--danger);
+        border-color: var(--danger);
+      }
+      .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+      }
+      .btn-icon {
+        padding: 8px;
+        border-radius: 6px;
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-icon:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* Admin Layout */
+      .admin-app {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-header {
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--line);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .admin-header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .admin-header h1 i {
+        color: var(--accent);
+      }
+      .header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .header-search {
+        position: relative;
+      }
+      .header-search input {
+        background: var(--bg-input);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 8px 16px 8px 36px;
+        color: var(--text-main);
+        font-size: 0.85rem;
+        width: 200px;
+      }
+      .header-search input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .header-search i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+
+      .admin-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        flex: 1;
+        min-height: 0;
+      }
+      .admin-container.sidebar-collapsed {
+        grid-template-columns: 0 1fr;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: var(--bg-card);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .sidebar-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .sidebar-header h2 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .paper-count {
+        font-size: 0.75rem;
+        background: var(--line);
+        padding: 2px 8px;
+        border-radius: 10px;
+        color: var(--text-muted);
+      }
+      .paper-list {
+        list-style: none;
+        flex: 1;
+        overflow-y: auto;
+      }
+      .paper-item {
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid var(--line-light);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .paper-item:hover {
+        background: var(--line-light);
+      }
+      .paper-item.active {
+        background: rgba(201, 120, 93, 0.1);
+        border-left: 3px solid var(--accent);
+      }
+      .paper-item-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .paper-item-info h3 {
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 2px;
+        color: var(--text-main);
+        text-transform: capitalize;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .paper-item-info p {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .paper-item-actions {
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+      }
+      .paper-item:hover .paper-item-actions {
+        opacity: 1;
+      }
+      .icon-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+      }
+      .icon-btn:hover {
+        background: var(--line);
+        color: var(--text-main);
+      }
+      .sidebar-footer {
+        padding: 0.75rem 1rem;
+        background: var(--bg-card);
+      }
+
+      /* Custom scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-body);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+      }
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--line) var(--bg-body);
+      }
+      .sidebar-toggle {
+        position: fixed;
+        left: 280px;
+        top: 70px;
+        width: 20px;
+        height: 40px;
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-left: none;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 0.65rem;
+        z-index: 200;
+        opacity: 0.5;
+      }
+      .sidebar-toggle:hover {
+        background: var(--accent);
+        color: white;
+        opacity: 1;
+      }
+      .sidebar-collapsed .sidebar-toggle {
+        left: 0;
+      }
+
+      /* Editor Area */
+      .editor-area {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .editor-toolbar {
+        padding: 0.75rem 1rem;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .input-group label {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+      .input-group input {
+        background: var(--bg-input);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 6px 10px;
+        color: var(--text-main);
+        font-family: "Fira Code", monospace;
+        font-size: 0.85rem;
+        width: 220px;
+      }
+      .input-group input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .toolbar-divider {
+        width: 1px;
+        height: 30px;
+        background: var(--line);
+        margin: 0 4px;
+      }
+      .toolbar-right {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* Dropdowns */
+      .dropdown {
+        position: relative;
+      }
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        min-width: 180px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s;
+        z-index: 100;
+      }
+      .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(5px);
+      }
+      .dropdown-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 14px;
+        text-align: left;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+      .dropdown-option:hover {
+        background: var(--line-light);
+        color: var(--accent);
+      }
+      .dropdown-divider {
+        height: 1px;
+        background: var(--line);
+        margin: 4px 0;
+      }
+
+      /* Word count & View toggle */
+      .word-count {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        padding: 4px 10px;
+        background: var(--bg-input);
+        border-radius: 4px;
+        display: flex;
+        gap: 12px;
+      }
+      .word-count span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .view-toggle {
+        display: flex;
+        background: var(--bg-input);
+        border-radius: 6px;
+        padding: 2px;
+      }
+      .view-toggle button {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+      .view-toggle button:hover {
+        color: var(--text-main);
+      }
+      .view-toggle button.active {
+        background: var(--accent);
+        color: white;
+      }
+      .autosave-indicator {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .unsaved-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--warning);
+        border-radius: 50%;
+        display: none;
+      }
+      .unsaved-dot.show {
+        display: inline-block;
+      }
+
+      /* Quick Insert */
+      .quick-insert {
+        display: flex;
+        gap: 4px;
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+      }
+      .quick-insert button {
+        background: var(--bg-input);
+        border: 1px solid var(--line);
+        color: var(--text-muted);
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        white-space: nowrap;
+        font-family: "Fira Code", monospace;
+      }
+      .quick-insert button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* Editor Content - THE KEY PART */
+      .editor-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
+      .editor-content.preview-only {
+        grid-template-columns: 0 1fr;
+      }
+      .editor-content.editor-only {
+        grid-template-columns: 1fr 0;
+      }
+      .editor-pane,
+      .preview-pane {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .editor-pane {
+        border-right: 1px solid var(--line);
+      }
+      .pane-header {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--line);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .pane-header i {
+        color: var(--accent);
+      }
+      textarea#markdown-editor {
+        flex: 1;
+        background: var(--bg-body);
+        border: none;
+        padding: 1.25rem;
+        color: var(--text-main);
+        font-family: "Fira Code", monospace;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        resize: none;
+        outline: none;
+      }
+      textarea#markdown-editor::placeholder {
+        color: var(--text-muted);
+      }
+      .preview-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.25rem;
+        background: var(--bg-body);
+      }
+
+      /* Preview styling */
+      .preview-content h1 {
+        font-family: "Lora", serif;
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+      }
+      .preview-content h2 {
+        font-family: "Lora", serif;
+        font-size: 1.2rem;
+        margin: 1.25rem 0 0.6rem;
+      }
+      .preview-content p {
+        margin-bottom: 0.875rem;
+        color: var(--text-light);
+      }
+      .preview-content ul,
+      .preview-content ol {
+        margin: 0.875rem 0 0.875rem 1.5rem;
+        color: var(--text-light);
+      }
+      .preview-content blockquote {
+        border-left: 3px solid var(--accent);
+        margin: 1rem 0;
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+      }
+      .preview-content code {
+        background: var(--bg-card);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Fira Code", monospace;
+      }
+
+      /* Empty state */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+        text-align: center;
+        padding: 2rem;
+      }
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+      }
+      .empty-state h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-light);
+      }
+      .shortcuts-hint {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 1rem;
+      }
+      .shortcuts-hint kbd {
+        background: var(--line);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 1000;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.success {
+        background: var(--success);
+        color: white;
+      }
+      .toast.error {
+        background: var(--danger);
+        color: white;
+      }
+      .toast.info {
+        background: var(--info);
+        color: white;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+      }
+      .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal {
+        background: var(--bg-card);
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+      }
+      .modal h3 {
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .modal p {
+        color: var(--text-muted);
+        margin-bottom: 1.25rem;
+        font-size: 0.9rem;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .admin-container {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .sidebar-toggle {
+          display: none;
+        }
+        .editor-content {
+          grid-template-columns: 1fr;
+        }
+        .preview-pane {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+      <div class="login-card">
+        <div class="login-header">
+          <i class="fas fa-shield-alt"></i>
+          <h2>Admin Login</h2>
+          <p>Enter your password to access the admin panel</p>
+        </div>
+        <form id="login-form">
+          <div class="login-input-group">
+            <i class="fas fa-key"></i>
+            <input
+              type="password"
+              id="login-password"
+              placeholder="Password"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              id="toggle-password"
+              title="Show/Hide Password"
+              aria-label="Toggle password visibility"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="login-error" id="login-error"></div>
+          <button type="submit" class="btn btn-primary login-btn">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+        <div class="login-footer">
+          <a href="../index.html"
+            ><i class="fas fa-arrow-left"></i> Back to Site</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin App (hidden until authenticated) -->
+    <div class="admin-app" id="admin-app" style="display: none">
+      <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+        <div class="header-actions">
+          <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="search-papers"
+              placeholder="Search papers..."
+            />
+          </div>
+          <button
+            class="btn-icon"
+            id="shortcuts-btn"
+            title="Keyboard Shortcuts"
+          >
+            <i class="fas fa-keyboard"></i>
+          </button>
+          <button class="btn-icon logout-btn" id="logout-btn" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+          <a href="../index.html" class="btn btn-secondary" target="_blank">
+            <i class="fas fa-external-link-alt"></i> View Site
+          </a>
+        </div>
+      </header>
+
+      <div class="admin-container">
+        <!-- Floating toggle button -->
+        <button
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          title="Toggle Sidebar (Ctrl+B)"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-header">
+            <h2>Papers</h2>
+            <span class="paper-count" id="paper-count">0</span>
+          </div>
+          <ul class="paper-list" id="paper-list"></ul>
+          <div class="sidebar-footer">
+            <button
+              class="btn btn-primary"
+              id="new-btn-sidebar"
+              style="width: 100%"
+            >
+              <i class="fas fa-plus"></i><span> New Paper</span>
+            </button>
+          </div>
+        </aside>
+
+        <main class="editor-area">
+          <div class="editor-toolbar">
+            <div class="input-group">
+              <label for="filename">Filename</label>
+              <input type="text" id="filename" placeholder="my-paper.md" />
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary" id="template-btn">
+                <i class="fas fa-file-alt"></i> Templates
+              </button>
+              <div class="dropdown-menu" id="template-menu">
+                <button class="dropdown-option" data-template="basic">
+                  <i class="fas fa-file"></i> Basic Paper
+                </button>
+                <button class="dropdown-option" data-template="research">
+                  <i class="fas fa-flask"></i> Research Article
+                </button>
+                <button class="dropdown-option" data-template="literature">
+                  <i class="fas fa-book"></i> Literature Review
+                </button>
+                <button class="dropdown-option" data-template="notes">
+                  <i class="fas fa-sticky-note"></i> Quick Notes
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-option" data-template="empty">
+                  <i class="fas fa-file-medical"></i> Empty Document
+                </button>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary" id="insert-btn">
+                <i class="fas fa-plus-circle"></i> Insert
+              </button>
+              <div class="dropdown-menu" id="insert-menu">
+                <button class="dropdown-option" data-insert="heading">
+                  <i class="fas fa-heading"></i> Heading
+                </button>
+                <button class="dropdown-option" data-insert="link">
+                  <i class="fas fa-link"></i> Link
+                </button>
+                <button class="dropdown-option" data-insert="image">
+                  <i class="fas fa-image"></i> Image
+                </button>
+                <button class="dropdown-option" data-insert="list">
+                  <i class="fas fa-list"></i> Bullet List
+                </button>
+                <button class="dropdown-option" data-insert="quote">
+                  <i class="fas fa-quote-left"></i> Blockquote
+                </button>
+                <button class="dropdown-option" data-insert="math">
+                  <i class="fas fa-square-root-alt"></i> Math Equation
+                </button>
+                <button class="dropdown-option" data-insert="table">
+                  <i class="fas fa-table"></i> Table
+                </button>
+              </div>
+            </div>
+
+            <div class="toolbar-right">
+              <div class="word-count" id="word-count">
+                <span
+                  ><i class="fas fa-font"></i>
+                  <span id="wc-words">0</span> words</span
+                >
+                <span
+                  ><i class="fas fa-paragraph"></i>
+                  <span id="wc-chars">0</span> chars</span
+                >
+              </div>
+
+              <div class="toolbar-divider"></div>
+
+              <div class="view-toggle">
+                <button data-view="split" class="active" title="Split View">
+                  <i class="fas fa-columns"></i>
+                </button>
+                <button data-view="editor" title="Editor Only">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button data-view="preview" title="Preview Only">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+
+              <div class="toolbar-divider"></div>
+
+              <div class="autosave-indicator" id="autosave-indicator">
+                <i class="fas fa-circle"></i>
+                <span>Ready</span>
+              </div>
+
+              <span
+                class="unsaved-dot"
+                id="unsaved-dot"
+                title="Unsaved changes"
+              ></span>
+
+              <button class="btn btn-primary" id="save-btn">
+                <i class="fas fa-save"></i> Save
+              </button>
+            </div>
+          </div>
+
+          <div class="quick-insert">
+            <button data-quick="**bold**" title="Bold">**B**</button>
+            <button data-quick="*italic*" title="Italic">*I*</button>
+            <button data-quick="# " title="Heading"># H1</button>
+            <button data-quick="## " title="Heading 2">## H2</button>
+            <button data-quick="### " title="Heading 3">### H3</button>
+            <button data-quick="- " title="List item">• List</button>
+            <button data-quick="1. " title="Numbered item">1. Num</button>
+            <button data-quick="[text](url)" title="Link">🔗 Link</button>
+            <button data-quick="$equation$" title="Inline Math">∑ Math</button>
+            <button data-quick="> " title="Quote">❝ Quote</button>
+            <button data-quick="---" title="Horizontal Rule">— HR</button>
+          </div>
+
+          <div class="editor-content" id="editor-content">
+            <div class="editor-pane">
+              <div class="pane-header">
+                <div class="pane-header-left">
+                  <i class="fas fa-code"></i> Markdown
+                </div>
+              </div>
+              <textarea
+                id="markdown-editor"
+                placeholder="Start writing your paper in Markdown...
+
+# Paper Title
+
+*Author Name — Month Year*
+
+## Abstract
+
+Write your abstract here...
+
+Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
+              ></textarea>
+            </div>
+
+            <div class="preview-pane">
+              <div class="pane-header">
+                <div class="pane-header-left">
+                  <i class="fas fa-eye"></i> Preview
+                </div>
+              </div>
+              <div class="preview-content" id="preview-content">
+                <div class="empty-state">
+                  <i class="fas fa-file-alt"></i>
+                  <h3>Live Preview</h3>
+                  <p>Start typing to see your formatted paper</p>
+                  <div class="shortcuts-hint">
+                    <kbd>Ctrl</kbd>+<kbd>S</kbd> Save &nbsp;
+                    <kbd>Ctrl</kbd>+<kbd>B</kbd> Bold &nbsp;
+                    <kbd>Ctrl</kbd>+<kbd>I</kbd> Italic
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+          <h3>
+            <i
+              class="fas fa-exclamation-triangle"
+              style="color: var(--danger)"
+            ></i>
+            Delete Paper?
+          </h3>
+          <p>
+            Are you sure you want to delete "<span id="delete-filename"></span
+            >"? This cannot be undone.
+          </p>
+          <div class="modal-actions">
+            <button class="btn btn-secondary" id="cancel-delete">Cancel</button>
+            <button class="btn btn-danger" id="confirm-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="shortcuts-modal">
+        <div class="modal" style="max-width: 500px; text-align: left">
+          <h3 style="justify-content: flex-start">
+            <i class="fas fa-keyboard" style="color: var(--accent)"></i>
+            Keyboard Shortcuts
+          </h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px;
+              margin-top: 1rem;
+            "
+          >
+            <div><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</div>
+            <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Bold</div>
+            <div><kbd>Ctrl</kbd>+<kbd>I</kbd> Italic</div>
+            <div><kbd>Ctrl</kbd>+<kbd>K</kbd> Insert Link</div>
+            <div><kbd>Ctrl</kbd>+<kbd>N</kbd> New Paper</div>
+            <div><kbd>Ctrl</kbd>+<kbd>D</kbd> Duplicate</div>
+            <div><kbd>Ctrl</kbd>+<kbd>/</kbd> Toggle Preview</div>
+            <div><kbd>Ctrl</kbd>+<kbd>\</kbd> Toggle Sidebar</div>
+            <div><kbd>Esc</kbd> Close Modals</div>
+          </div>
+          <div class="modal-actions" style="margin-top: 1.5rem">
+            <button class="btn btn-secondary" id="close-shortcuts">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End admin-app -->
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify for XSS protection -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
+    <!-- Inline Backup Login Handler (works even if script.js fails to load) -->
+    <script>
+      (function () {
+        var loginForm = document.getElementById("login-form");
+        if (loginForm && !loginForm._hasHandler) {
+          loginForm._hasHandler = true;
+          loginForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            var pwd = document.getElementById("login-password");
+            var err = document.getElementById("login-error");
+            var btn = loginForm.querySelector("button[type=submit]");
+
+            if (!pwd || !pwd.value) {
+              if (err) err.textContent = "Please enter password";
+              return;
+            }
+
+            if (btn) {
+              btn.disabled = true;
+              btn.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            }
+
+            try {
+              var res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({ password: pwd.value }),
+              });
+              var data = await res.json();
+
+              if (data.success) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("admin-app").style.display = "block";
+                if (typeof loadPapers === "function") loadPapers();
+              } else {
+                if (err) err.textContent = data.error || "Invalid password";
+              }
+            } catch (ex) {
+              console.error("Login error:", ex);
+              if (err) err.textContent = "Connection error";
+            }
+
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+          });
+        }
+      })();
+    </script>
+
+    <!-- Main Admin Script -->
+    <script src="script.js"></script>
+  </body>
+</html>

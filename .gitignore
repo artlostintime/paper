@@ -12,7 +12,7 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-
+.txt
 # Editor files
 .vscode/
 .idea/

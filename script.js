@@ -436,7 +436,10 @@ async function renderPapers(filesToRender) {
 
       const article = document.createElement("article");
       article.className = "paper-entry";
-      article.innerHTML = marked.parse(previewText);
+      const rawHTML = marked.parse(previewText);
+      article.innerHTML = window.DOMPurify
+        ? DOMPurify.sanitize(rawHTML)
+        : rawHTML;
 
       // Add category badge and reading time to meta line
       const metaLine = article.querySelector("em");
