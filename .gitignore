@@ -21,3 +21,6 @@ admin.html.txt
 .idea/
 *.swp
 *.swo
+
+#github
+.github/
