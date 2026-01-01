@@ -359,11 +359,16 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ============== STATIC FILES ==============
-  let filePath = pathname === "/" ? "/index.html" : pathname;
+  let filePath = pathname === "/" ? "/public/index.html" : pathname;
 
   // Handle /admin route
   if (pathname === "/admin" || pathname === "/admin/") {
-    filePath = "/admin/index.html";
+    filePath = "/public/admin/index.html";
+  }
+
+  // Prefix all non-API paths with /public
+  if (!filePath.startsWith("/public/") && !pathname.startsWith("/api/")) {
+    filePath = "/public" + filePath;
   }
 
   filePath = path.join(__dirname, filePath);

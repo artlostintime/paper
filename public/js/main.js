@@ -349,9 +349,10 @@ async function loadPaperList() {
 async function prefetchPaperContents() {
   const fetchPromises = paperFiles.map(async (filename) => {
     try {
-      const response = await fetch(`papers/${filename}`);
+      const response = await fetch(`/api/papers/${filename}`);
       if (response.ok) {
-        paperContents[filename] = await response.text();
+        const data = await response.json();
+        paperContents[filename] = data.content;
       }
     } catch (e) {
       console.error(`Failed to prefetch ${filename}`);
@@ -405,9 +406,10 @@ async function renderPapers(filesToRender) {
       // Use cached content if available
       let markdownText = paperContents[filename];
       if (!markdownText) {
-        const response = await fetch(`papers/${filename}`);
+        const response = await fetch(`/api/papers/${filename}`);
         if (!response.ok) throw new Error(`Could not load ${filename}`);
-        markdownText = await response.text();
+        const data = await response.json();
+        markdownText = data.content;
         paperContents[filename] = markdownText;
       }
 
@@ -510,7 +512,7 @@ async function renderPapers(filesToRender) {
       const errorEl = document.createElement("article");
       errorEl.className = "paper-entry paper-error";
       errorEl.innerHTML = `
-        <p><i class="fas fa-exclamation-circle"></i> Error loading: ${filename}</p>
+        <p><i class="fas fa-exclamation-circle"></i> Error loading: ${filename} <br> <small>${error.message}</small></p>
       `;
       container.appendChild(errorEl);
     }

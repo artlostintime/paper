@@ -13,7 +13,7 @@
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>"
     />
 
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/main.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -190,13 +190,14 @@
         }
 
         try {
-          const response = await fetch(`papers/${paperFile}`);
+          const response = await fetch(`/api/papers/${paperFile}`);
           if (!response.ok) {
             showNotFound();
             return;
           }
 
-          let markdown = await response.text();
+          const data = await response.json();
+          let markdown = data.content;
 
           // Extract data before parsing
           const keywords = extractKeywords(markdown);
