@@ -1,61 +1,76 @@
-# Psychology Portfolio
+# 🧠 Psychology Portfolio
 
-A dynamic academic portfolio website for showcasing research papers with a password-protected admin panel. Built with vanilla JavaScript, Node.js HTTP server, and markdown-based content.
-
----
-
-## 📁 Project Structure
-
-```
-port/
-├── server.js              # Node.js HTTP server with authentication
-├── package.json           # Dependencies (dotenv only)
-├── .env                   # Environment variables (ADMIN_PASSWORD)
-├── .gitignore            # Git ignore rules
-├── README.md             # This documentation
-├── papers/               # Markdown research papers
-│   ├── burnout.md
-│   ├── anxiety.md
-│   └── ... (add more .md files)
-└── public/               # Static files served by server
-    ├── index.html        # Main portfolio homepage
-    ├── paper.html        # Individual paper viewer
-    ├── css/
-    │   └── main.css      # All styles (dark/light themes)
-    ├── js/
-    │   └── main.js       # Frontend JavaScript
-    └── admin/            # Password-protected admin panel
-        ├── index.html    # Admin dashboard
-        ├── admin.css     # Admin panel styles
-        └── admin.js      # Admin functionality
-```
-
----
+A modern, minimalist portfolio website for psychology research papers, built with vanilla JavaScript and a markdown-based content system.
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v14 or higher)
-
-### Installation
-
 ```bash
-# Navigate to project directory
-cd path/to/port
-
 # Install dependencies
 npm install
 
-# Create .env file (optional - sets admin password)
-echo ADMIN_PASSWORD=your_secure_password > .env
+# Run the server
+node server.js
 ```
+
+Visit `http://localhost:3000` for the public site or `http://localhost:3000/admin` for the admin panel.
+
+**Default admin password:** `admin123`
+
+## 📚 Documentation
+
+See the [`docs/`](docs) folder for comprehensive documentation:
+
+- **[Getting Started](docs/GETTING_STARTED.md)** - Installation and setup
+- **[Admin Guide](docs/ADMIN_GUIDE.md)** - Using the admin panel
+- **[Features](docs/FEATURES.md)** - Complete feature list
+- **[Keyboard Shortcuts](docs/SHORTCUTS.md)** - All shortcuts
+- **[API Reference](docs/API.md)** - Server API endpoints
+- **[Architecture](docs/ARCHITECTURE.md)** - Technical overview
+- **[Changelog](docs/CHANGELOG.md)** - Update history
+
+## ✨ Key Features
+
+- 📝 Markdown editor with live preview
+- 🔐 Secure authentication system
+- 📤 Export to Markdown, HTML, Text, PDF
+- 🎨 Dark/Light theme toggle
+- ⌨️ Keyboard shortcuts for productivity
+- 📁 Drag & drop file upload
+- 🎯 Distraction-free writing mode
+- 📋 Multiple paper templates
+- 🔍 Search and category filtering
+
+## 🛠️ Tech Stack
+
+- **Backend:** Node.js (native HTTP/HTTPS)
+- **Frontend:** Vanilla JavaScript
+- **Markdown:** marked.js + KaTeX
+- **Storage:** File system (no database)
+- **Security:** DOMPurify, HttpOnly cookies
+
+## 📦 Project Structure
+
+```
+port/
+├── server.js           # Node.js server
+├── papers/             # Paper storage
+├── public/             # Public site
+│   ├── admin/         # Admin panel
+│   ├── css/           # Stylesheets
+│   └── js/            # JavaScript
+├── docs/              # Documentation
+└── ssl/               # SSL certificates (optional)
+```
+
+echo ADMIN_PASSWORD=your_secure_password > .env
+
+````
 
 ### Start the Server
 
 ```bash
 node server.js
-```
+````
 
 The server will start on **http://localhost:3000**
 
