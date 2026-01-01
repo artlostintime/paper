@@ -24,3 +24,27 @@ admin.html.txt
 
 #github
 .github/
+
+# SSL certificates
+ssl/
+*.pem
+
+# Build outputs (if you add a build step later)
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Session/cache data (if implemented)
+.cache/
+sessions/
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Package manager lock files (optional - depends on team preference)
+# package-lock.json
+# yarn.lock

@@ -3,6 +3,7 @@ require("dotenv").config();
 
 // Built-in modules
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
@@ -44,12 +45,18 @@ function isRateLimited(ip) {
   const attempts = loginAttempts.get(ip);
   if (!attempts) return false;
 
-  if (Date.now() > attempts.lockoutUntil) {
-    loginAttempts.delete(ip);
-    return false;
+  // Check if already at max attempts
+  if (attempts.count >= MAX_ATTEMPTS) {
+    // If lockout time was set and expired, clear and allow retry
+    if (attempts.lockoutUntil > 0 && Date.now() >= attempts.lockoutUntil) {
+      loginAttempts.delete(ip);
+      return false;
+    }
+    // Still locked out
+    return true;
   }
 
-  return attempts.count >= MAX_ATTEMPTS;
+  return false;
 }
 
 function recordFailedAttempt(ip) {
@@ -61,6 +68,9 @@ function recordFailedAttempt(ip) {
   }
 
   loginAttempts.set(ip, attempts);
+
+  // Return current state for immediate use
+  return attempts;
 }
 
 function clearAttempts(ip) {
@@ -213,9 +223,9 @@ const server = http.createServer(async (req, res) => {
         );
         sendJSON(res, 200, { success: true, token });
       } else {
-        recordFailedAttempt(clientIP);
-        const attempts = loginAttempts.get(clientIP);
-        const remaining = MAX_ATTEMPTS - (attempts?.count || 0);
+        // Record failure FIRST, then get the updated state
+        const attempts = recordFailedAttempt(clientIP);
+        const remaining = MAX_ATTEMPTS - attempts.count;
 
         // Add delay to slow down brute force
         await new Promise((r) => setTimeout(r, 1000));
@@ -408,7 +418,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n🚀 Server running at http://localhost:${PORT}`);
+  console.log(`\n� Server running at http://localhost:${PORT}`);
   console.log(`📁 Papers directory: ${PAPERS_DIR}`);
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin`);
   console.log(`\n⚠️  Default password: ${ADMIN_PASSWORD}`);
