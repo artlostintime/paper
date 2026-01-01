@@ -10,6 +10,8 @@ const url = require("url");
 const crypto = require("crypto");
 
 const PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+const USE_HTTPS = process.env.USE_HTTPS === "true";
 const PAPERS_DIR = path.join(__dirname, "papers");
 
 // ============== AUTHENTICATION CONFIG ==============
@@ -155,7 +157,8 @@ function sendJSON(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
-const server = http.createServer(async (req, res) => {
+// ============== REQUEST HANDLER ==============
+const requestHandler = async (req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
@@ -163,6 +166,8 @@ const server = http.createServer(async (req, res) => {
   const allowedOrigins = [
     `http://localhost:${PORT}`,
     `http://127.0.0.1:${PORT}`,
+    `https://localhost:${HTTPS_PORT}`,
+    `https://127.0.0.1:${HTTPS_PORT}`,
   ];
   const origin = req.headers.origin;
   if (origin && allowedOrigins.includes(origin)) {
@@ -180,6 +185,14 @@ const server = http.createServer(async (req, res) => {
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("X-XSS-Protection", "1; mode=block");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Add HSTS header for HTTPS
+  if (USE_HTTPS) {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains"
+    );
+  }
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -213,14 +226,20 @@ const server = http.createServer(async (req, res) => {
           ip: clientIP,
         });
 
-        // SameSite=Lax allows the cookie to work with normal navigation
-        // Not using Secure since this is localhost (HTTP not HTTPS)
-        res.setHeader(
-          "Set-Cookie",
-          `admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${
-            SESSION_DURATION / 1000
-          }`
-        );
+        // Set cookie with Secure flag if HTTPS is enabled
+        const cookieFlags = [
+          `admin_token=${token}`,
+          "Path=/",
+          "HttpOnly",
+          "SameSite=Lax",
+          `Max-Age=${SESSION_DURATION / 1000}`,
+        ];
+
+        if (USE_HTTPS) {
+          cookieFlags.push("Secure"); // Only send over HTTPS
+        }
+
+        res.setHeader("Set-Cookie", cookieFlags.join("; "));
         sendJSON(res, 200, { success: true, token });
       } else {
         // Record failure FIRST, then get the updated state
@@ -368,6 +387,37 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ============== ADMIN ASSETS ==============
+  // Handle /admin/admin.js, /admin/admin.css, etc.
+  if (pathname.startsWith("/admin/") && pathname !== "/admin/") {
+    const assetPath = pathname.substring(7); // Remove "/admin/" prefix
+    const assetFile = path.join(__dirname, "public", "admin", assetPath);
+
+    const ext = path.extname(assetFile).toLowerCase();
+    const contentType = MIME_TYPES[ext] || "application/octet-stream";
+
+    fs.readFile(assetFile, (err, content) => {
+      if (err) {
+        if (err.code === "ENOENT") {
+          res.writeHead(404, { "Content-Type": "text/html" });
+          res.end("<h1>404 - File Not Found</h1>");
+        } else {
+          res.writeHead(500);
+          res.end(`Server Error: ${err.code}`);
+        }
+      } else {
+        const cacheableTypes = [".css", ".js", ".png", ".jpg", ".svg", ".ico"];
+        const headers = { "Content-Type": contentType };
+        if (cacheableTypes.includes(ext)) {
+          headers["Cache-Control"] = "public, max-age=86400";
+        }
+        res.writeHead(200, headers);
+        res.end(content);
+      }
+    });
+    return;
+  }
+
   // ============== STATIC FILES ==============
   let filePath = pathname === "/" ? "/public/index.html" : pathname;
 
@@ -415,12 +465,64 @@ const server = http.createServer(async (req, res) => {
       res.end(content);
     }
   });
-});
+};
 
-server.listen(PORT, () => {
-  console.log(`\n� Server running at http://localhost:${PORT}`);
-  console.log(`📁 Papers directory: ${PAPERS_DIR}`);
-  console.log(`🔐 Admin panel: http://localhost:${PORT}/admin`);
-  console.log(`\n⚠️  Default password: ${ADMIN_PASSWORD}`);
-  console.log(`   Change ADMIN_PASSWORD in server.js for production!\n`);
-});
+// ============== SERVER CREATION ==============
+
+if (USE_HTTPS) {
+  // Load SSL certificates
+  const keyPath =
+    process.env.SSL_KEY_PATH || path.join(__dirname, "ssl", "key.pem");
+  const certPath =
+    process.env.SSL_CERT_PATH || path.join(__dirname, "ssl", "cert.pem");
+
+  let httpsOptions;
+  try {
+    httpsOptions = {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    };
+    console.log("✅ SSL certificates loaded");
+  } catch (error) {
+    console.error("❌ Failed to load SSL certificates:", error.message);
+    console.log(
+      "\n📝 Generate certificates with:\n   openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj '/CN=localhost'\n"
+    );
+    process.exit(1);
+  }
+
+  // Create HTTPS server
+  const httpsServer = https.createServer(httpsOptions, requestHandler);
+  httpsServer.listen(HTTPS_PORT, () => {
+    console.log(`\n🔒 HTTPS Server running at https://localhost:${HTTPS_PORT}`);
+    console.log(`📁 Papers directory: ${PAPERS_DIR}`);
+    console.log(`🔐 Admin panel: https://localhost:${HTTPS_PORT}/admin`);
+    console.log(
+      `\n⚠️  Using self-signed certificate - browsers will show warning`
+    );
+    console.log(`   Password: ${ADMIN_PASSWORD}\n`);
+  });
+
+  // Optional: HTTP redirect server
+  const httpRedirectServer = http.createServer((req, res) => {
+    res.writeHead(301, {
+      Location: `https://${req.headers.host.replace(PORT, HTTPS_PORT)}${
+        req.url
+      }`,
+    });
+    res.end();
+  });
+
+  httpRedirectServer.listen(PORT, () => {
+    console.log(`↪️  HTTP→HTTPS redirect on http://localhost:${PORT}\n`);
+  });
+} else {
+  // Create HTTP server (development)
+  const httpServer = http.createServer(requestHandler);
+  httpServer.listen(PORT, () => {
+    console.log(`\n🚀 HTTP Server running at http://localhost:${PORT}`);
+    console.log(`📁 Papers directory: ${PAPERS_DIR}`);
+    console.log(`🔐 Admin panel: http://localhost:${PORT}/admin`);
+    console.log(`\n⚠️  Password: ${ADMIN_PASSWORD}\n`);
+  });
+}
