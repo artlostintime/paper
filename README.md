@@ -31,13 +31,14 @@ See the [`docs/`](docs) folder for comprehensive documentation:
 ## ✨ Key Features
 
 - 📝 Markdown editor with live preview
+- 🏷️ YAML frontmatter support for metadata
 - 🔐 Secure authentication system
 - 📤 Export to Markdown, HTML, Text, PDF
 - 🎨 Dark/Light theme toggle
 - ⌨️ Keyboard shortcuts for productivity
 - 📁 Drag & drop file upload
 - 🎯 Distraction-free writing mode
-- 📋 Multiple paper templates
+- 📋 Multiple paper templates (all with YAML)
 - 🔍 Search and category filtering
 
 ## 🛠️ Tech Stack
@@ -45,6 +46,7 @@ See the [`docs/`](docs) folder for comprehensive documentation:
 - **Backend:** Node.js (native HTTP/HTTPS)
 - **Frontend:** Vanilla JavaScript
 - **Markdown:** marked.js + KaTeX
+- **Metadata:** gray-matter (YAML frontmatter)
 - **Storage:** File system (no database)
 - **Security:** DOMPurify, HttpOnly cookies
 
@@ -101,6 +103,14 @@ Press `Ctrl + C` in the terminal.
 2. **Use this template:**
 
 ```markdown
+---
+title: Paper Title Here
+author: Author Name
+date: 2026-01-02
+tags: [research, psychology]
+category: Clinical
+---
+
 # Paper Title Here
 
 _Author Name • Published YEAR_
@@ -142,13 +152,11 @@ Author, A. A. (Year). Title of article. _Journal Name_, Vol(Issue), pages. https
 [Read Full Article](https://doi.org/xxxxx)
 ```
 
-3. **Optional: Add hashtag keywords** at the very top:
+3. **YAML frontmatter** (optional but recommended):
 
-   ```markdown
-   #burnout #mental-health #workplace
-
-   # Paper Title Here
-   ```
+   - Add metadata between `---` delimiters at file start
+   - Hidden in previews, visible only when editing
+   - Use the YAML button in admin panel for quick insertion
 
 4. **No restart needed** - papers load dynamically via API
 
@@ -157,9 +165,15 @@ Author, A. A. (Year). Title of article. _Journal Name_, Vol(Issue), pages. https
 1. Navigate to **http://localhost:3000/admin**
 2. Login with your admin password
 3. Features:
-   - Create new papers
+   - Create new papers with templates
    - Edit existing papers with live preview
+   - YAML frontmatter insertion button
    - Delete papers
+   - Export to MD/HTML/TXT/PDF
+   - Drag & drop file upload
+   - Dark/Light theme toggle
+   - Adjustable font sizes
+   - Distraction-free mode (F11)
    - Autosave (2-second debounce)
    - Markdown and math syntax highlighting
 

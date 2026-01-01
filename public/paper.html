@@ -199,6 +199,14 @@
           const data = await response.json();
           let markdown = data.content;
 
+          // Remove YAML frontmatter (everything between --- delimiters at start)
+          if (markdown.trimStart().startsWith("---")) {
+            const yamlEndIndex = markdown.indexOf("\n---", 4);
+            if (yamlEndIndex !== -1) {
+              markdown = markdown.substring(yamlEndIndex + 4).trim();
+            }
+          }
+
           // Extract data before parsing
           const keywords = extractKeywords(markdown);
           currentCitation = extractCitation(markdown);

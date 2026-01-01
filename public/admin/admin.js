@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fontIncrease = document.getElementById("font-increase");
   const fontDecrease = document.getElementById("font-decrease");
   const distractionFree = document.getElementById("distraction-free");
+  const yamlBtn = document.getElementById("yaml-btn");
 
   // ============== STATE ==============
   let papers = [];
@@ -525,8 +526,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Remove YAML frontmatter (everything between --- delimiters at start)
+    let cleanContent = content;
+    if (content.trimStart().startsWith("---")) {
+      const yamlEndIndex = content.indexOf("\n---", 4);
+      if (yamlEndIndex !== -1) {
+        cleanContent = content.substring(yamlEndIndex + 4).trim();
+      }
+    }
+
     // Remove tag lines (lines that are only hashtags)
-    const cleanContent = content
+    cleanContent = cleanContent
       .replace(/^#[\w-]+(\s+#[\w-]+)*\s*$/gm, "")
       .trim();
 
@@ -623,6 +633,39 @@ document.addEventListener("DOMContentLoaded", () => {
     setUnsaved(true);
   }
 
+  function insertYAML() {
+    if (!editor) return;
+
+    // Check if YAML already exists at the start
+    const content = editor.value.trim();
+    if (content.startsWith("---")) {
+      showToast("YAML frontmatter already exists!", "warning");
+      return;
+    }
+
+    const yamlTemplate = `---
+title: "${filenameInput?.value.replace(".md", "") || "Paper Title"}"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "general"
+tags: ["research", "psychology"]
+description: "Brief paper description"
+published: true
+---
+
+`;
+
+    // Insert at the beginning
+    editor.value = yamlTemplate + editor.value;
+    editor.focus();
+    editor.setSelectionRange(0, 0);
+
+    updatePreview();
+    updateWordCount();
+    setUnsaved(true);
+    showToast("YAML frontmatter added!", "success");
+  }
+
   function wrapSelection(before, after) {
     if (!editor) return;
     const start = editor.selectionStart;
@@ -658,7 +701,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ============== TEMPLATES ==============
   const templates = {
-    basic: `# Paper Title
+    basic: `---
+title: "Paper Title"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "general"
+tags: ["research", "psychology"]
+description: "Brief paper description for SEO"
+published: true
+---
+
+# Paper Title
 
 *Your Name — ${new Date().toLocaleDateString("en-US", {
       month: "long",
@@ -687,7 +740,15 @@ Concluding thoughts...
 
 Author, A. A. (Year). Title. *Journal*, Volume(Issue), pages.`,
 
-    research: `#clinical #research
+    research: `---
+title: "Research Paper Title"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "research"
+tags: ["clinical", "research", "methodology"]
+description: "Research study investigating..."
+published: true
+---
 
 # Research Paper Title
 
@@ -732,7 +793,17 @@ Summary of key findings.
 
 Author, A. A. (Year). Title. *Journal*, Volume(Issue), pages.`,
 
-    notes: `# Quick Notes: Topic Name
+    notes: `---
+title: "Quick Notes: Topic Name"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "notes"
+tags: ["notes", "quick-reference"]
+description: "Quick notes on..."
+published: false
+---
+
+# Quick Notes: Topic Name
 
 *${new Date().toLocaleDateString("en-US", {
       month: "long",
@@ -755,7 +826,15 @@ Brief summary here...
 - Source 1
 - Source 2`,
 
-    clinical: `#clinical #case-study
+    clinical: `---
+title: "Clinical Case Study: Patient Condition"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "clinical"
+tags: ["clinical", "case-study", "assessment"]
+description: "Clinical case study of..."
+published: true
+---
 
 # Clinical Case Study: [Patient/Condition]
 
@@ -793,7 +872,15 @@ Tracking of treatment progress...
 
 APA. (2013). *Diagnostic and Statistical Manual of Mental Disorders* (5th ed.).`,
 
-    experiment: `#research #experimental
+    experiment: `---
+title: "Experimental Study: Research Title"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "research"
+tags: ["experimental", "research", "methodology"]
+description: "Experimental study examining..."
+published: true
+---
 
 # Experimental Study: [Title]
 
@@ -854,7 +941,16 @@ Key takeaways and future directions.
 
 Author, A. A. (Year). Title. *Journal*, Volume(Issue), pages.`,
 
-    summary: `#summary #literature
+    summary: `---
+title: "Paper Summary: Original Title"
+author: "Your Name"
+date: "${new Date().toISOString().split("T")[0]}"
+category: "literature"
+tags: ["summary", "literature-review", "critique"]
+original_authors: "Author et al. (Year)"
+description: "Summary and critique of..."
+published: true
+---
 
 # Paper Summary: [Original Title]
 
@@ -1373,6 +1469,11 @@ ${html}
   // Distraction-free mode
   if (distractionFree) {
     distractionFree.addEventListener("click", toggleDistractionFree);
+  }
+
+  // YAML button
+  if (yamlBtn) {
+    yamlBtn.addEventListener("click", insertYAML);
   }
 
   // Keyboard shortcuts

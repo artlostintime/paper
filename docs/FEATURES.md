@@ -5,6 +5,7 @@
 ### 📝 Markdown Editor
 
 - Live preview with KaTeX math rendering
+- YAML frontmatter support with insertion button
 - Monospace Fira Code font
 - Auto-scroll sync between editor and preview
 - Word and character counter
@@ -50,9 +51,12 @@
 - Paper Summary/Review
 - Empty Document
 
+**Note:** All templates include YAML frontmatter blocks.
+
 ### ⚡ Quick Actions
 
 - Insert heading, link, image, list, quote, math, table
+- YAML frontmatter insertion button
 - Template system with 7+ pre-made formats
 - Quick insert toolbar for common markdown
 

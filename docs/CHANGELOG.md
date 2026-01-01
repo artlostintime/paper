@@ -1,5 +1,34 @@
 # 📝 Changelog
 
+## [2.1.0] - January 2, 2026
+
+### 🎉 New Features
+
+#### YAML Frontmatter Support
+
+- Added `gray-matter` package for YAML frontmatter parsing
+- Server API now returns structured `{content, frontmatter, raw}` data
+- YAML button in admin toolbar for quick frontmatter insertion
+- All 7 templates updated with YAML metadata blocks
+- Auto-fills filename as title and current date
+- Checks for existing YAML to prevent duplicates
+
+#### Preview Improvements
+
+- YAML frontmatter now hidden in all preview contexts:
+  - Admin panel live preview
+  - Public site paper grid
+  - Full paper viewer (paper.html)
+- Raw YAML still visible in editor for editing
+
+### ✨ Improvements
+
+- Introduction section rewritten with more engaging copy
+- Timeline updated with accurate milestones
+- Backward compatible: papers without YAML still work
+
+---
+
 ## [2.0.0] - January 2, 2026
 
 ### 🎉 Major Features

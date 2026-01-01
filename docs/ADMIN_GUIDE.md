@@ -47,6 +47,16 @@
 - **Experiment Report** - Full experimental study format
 - **Paper Summary** - Review existing papers
 
+**Note:** All templates include YAML frontmatter for metadata.
+
+### Adding YAML Frontmatter
+
+1. Click **YAML** button in toolbar
+2. Frontmatter template inserted at document start
+3. Auto-fills filename as title and current date
+4. Edit fields: title, author, date, tags, category
+5. YAML hidden in preview, visible only in editor
+
 ## Exporting Papers
 
 1. Click **Export** in toolbar

@@ -109,9 +109,23 @@ Get paper content (public endpoint).
 
 ```json
 {
-  "content": "# Paper Title\n\n*Author...*"
+  "content": "# Paper Title\n\n*Author...*",
+  "frontmatter": {
+    "title": "Paper Title",
+    "author": "Author Name",
+    "date": "2026-01-02",
+    "tags": ["research", "psychology"],
+    "category": "Clinical"
+  },
+  "raw": "---\ntitle: Paper Title\n---\n# Paper Title..."
 }
 ```
+
+**Note:**
+
+- `frontmatter` contains parsed YAML metadata (empty object if no YAML)
+- `content` is markdown without YAML frontmatter
+- `raw` is the complete file including YAML
 
 **Error Response:**
 

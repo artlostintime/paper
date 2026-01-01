@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const url = require("url");
 const crypto = require("crypto");
+const matter = require("gray-matter");
 
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
@@ -330,7 +331,19 @@ const requestHandler = async (req, res) => {
         sendJSON(res, 404, { error: "File not found" });
         return;
       }
-      sendJSON(res, 200, { content });
+
+      // Parse YAML frontmatter
+      try {
+        const { data: frontmatter, content: markdownContent } = matter(content);
+        sendJSON(res, 200, {
+          content: markdownContent,
+          frontmatter: frontmatter,
+          raw: content, // Keep raw for admin editing
+        });
+      } catch (e) {
+        // If parsing fails, return raw content
+        sendJSON(res, 200, { content, frontmatter: {}, raw: content });
+      }
     });
     return;
   }

@@ -1,53 +1,49 @@
-#summary #literature
+---
+title: "Research Paper Title"
+author: "Your Name"
+date: "2026-01-01"
+category: "research"
+tags: ["clinical", "research", "methodology"]
+description: "Research study investigating..."
+published: true
+---
 
-# Paper Summary: [Original Title]
+# Research Paper Title
 
-**Original Authors:** Author et al. (Year)
+*Your Name — January 2026*
 
-**Summarized by:** Your Name — January 2026
+## Abstract
+
+A concise summary of the research objectives, methodology, key findings, and conclusions.
+
+## Introduction
+
+Background information and context. State the research question or hypothesis.
+
+## Method
+
+### Participants
+Description of participants (N = X, demographics).
+
+### Procedure
+Step-by-step description of the research process.
+
+## Results
+
+Present findings with statistics:
+- Mean: $M = 0.00$, $SD = 0.00$
+- Correlation: $r = .00$, $p < .05$
+
+## Discussion
+
+Interpretation of results, implications, limitations.
+
+## Conclusion
+
+Summary of key findings.
 
 ---
 
-## Overview
+**References:**
 
-Brief description of the paper's main focus.
-
-## Research Question
-
-What question were the authors trying to answer?
-
-## Methodology
-
-- **Design:** Experimental/Survey/Meta-analysis/etc.
-- **Sample:** Description of participants
-- **Measures:** Key variables and instruments
-
-## Key Findings
-
-1. Finding 1
-2. Finding 2
-3. Finding 3
-
-## Strengths
-
-- Strength 1
-- Strength 2
-
-## Limitations
-
-- Limitation 1
-- Limitation 2
-
-## Implications
-
-What does this mean for theory/practice/future research?
-
-## Personal Notes
-
-Your thoughts, critiques, or connections to other work...
-
----
-
-**Full Citation:**
-
-Author, A. A., & Author, B. B. (Year). Title of article. *Journal Name*, Volume(Issue), pages. DOI
+Author, A. A. (Year). Title. *Journal*, Volume(Issue), pages.

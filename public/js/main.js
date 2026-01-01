@@ -423,6 +423,14 @@ async function renderPapers(filesToRender) {
       const meta = paperMetadata[filename];
       const recent = meta && isRecent(meta.mtime);
 
+      // Remove YAML frontmatter (everything between --- delimiters at start)
+      if (markdownText.trimStart().startsWith("---")) {
+        const yamlEndIndex = markdownText.indexOf("\n---", 4);
+        if (yamlEndIndex !== -1) {
+          markdownText = markdownText.substring(yamlEndIndex + 4).trim();
+        }
+      }
+
       // Remove keyword lines from preview
       markdownText = removeKeywordLine(markdownText);
 
