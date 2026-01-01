@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("save-btn");
   const templateBtn = document.getElementById("template-btn");
   const templateMenu = document.getElementById("template-menu");
+  const exportBtn = document.getElementById("export-btn");
+  const exportMenu = document.getElementById("export-menu");
   const insertBtn = document.getElementById("insert-btn");
   const insertMenu = document.getElementById("insert-menu");
   const toast = document.getElementById("toast");
@@ -38,6 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeShortcuts = document.getElementById("close-shortcuts");
   const cancelDelete = document.getElementById("cancel-delete");
   const confirmDelete = document.getElementById("confirm-delete");
+  const themeToggle = document.getElementById("theme-toggle");
+  const fontIncrease = document.getElementById("font-increase");
+  const fontDecrease = document.getElementById("font-decrease");
+  const distractionFree = document.getElementById("distraction-free");
 
   // ============== STATE ==============
   let papers = [];
@@ -45,6 +51,96 @@ document.addEventListener("DOMContentLoaded", () => {
   let hasUnsavedChanges = false;
   let autosaveTimer = null;
   let searchQuery = "";
+  let editorFontSize = 14; // Default font size in pixels
+  let currentTheme = localStorage.getItem("adminTheme") || "dark";
+
+  // Warn before leaving with unsaved changes
+  window.addEventListener("beforeunload", (e) => {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue =
+        "You have unsaved changes. Are you sure you want to leave?";
+      return e.returnValue;
+    }
+  });
+
+  // Initialize theme
+  function initTheme() {
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    updateThemeIcon();
+  }
+
+  function updateThemeIcon() {
+    if (themeToggle) {
+      const icon = themeToggle.querySelector("i");
+      if (currentTheme === "dark") {
+        icon.className = "fas fa-sun";
+        themeToggle.title = "Switch to Light Theme";
+      } else {
+        icon.className = "fas fa-moon";
+        themeToggle.title = "Switch to Dark Theme";
+      }
+    }
+  }
+
+  function toggleTheme() {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    localStorage.setItem("adminTheme", currentTheme);
+    updateThemeIcon();
+    showToast(`Switched to ${currentTheme} theme`, "success");
+  }
+
+  // Font size controls
+  function updateFontSize() {
+    if (editor) {
+      editor.style.fontSize = `${editorFontSize}px`;
+      localStorage.setItem("editorFontSize", editorFontSize);
+    }
+  }
+
+  function increaseFontSize() {
+    if (editorFontSize < 24) {
+      editorFontSize++;
+      updateFontSize();
+      showToast(`Font size: ${editorFontSize}px`, "info");
+    }
+  }
+
+  function decreaseFontSize() {
+    if (editorFontSize > 10) {
+      editorFontSize--;
+      updateFontSize();
+      showToast(`Font size: ${editorFontSize}px`, "info");
+    }
+  }
+
+  // Distraction-free mode
+  function toggleDistractionFree() {
+    if (adminContainer) {
+      adminContainer.classList.toggle("distraction-free");
+      const isActive = adminContainer.classList.contains("distraction-free");
+      if (distractionFree) {
+        const icon = distractionFree.querySelector("i");
+        icon.className = isActive ? "fas fa-compress" : "fas fa-expand";
+        distractionFree.title = isActive
+          ? "Exit Distraction Free (F11)"
+          : "Distraction Free (F11)";
+      }
+      showToast(
+        isActive
+          ? "Distraction-free mode enabled"
+          : "Distraction-free mode disabled",
+        "info"
+      );
+    }
+  }
+
+  // Initialize font size from localStorage
+  const savedFontSize = localStorage.getItem("editorFontSize");
+  if (savedFontSize) {
+    editorFontSize = parseInt(savedFontSize);
+  }
 
   // ============== AUTHENTICATION ==============
   function showLoginScreen() {
@@ -224,13 +320,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     paperList.innerHTML = filtered
-      .map(
-        (filename) => `
+      .map((filename) => {
+        // Check if file was modified recently (within 24 hours)
+        const isRecent = false; // Will be true when we have file metadata
+        return `
       <li class="paper-item ${
         currentFile === filename ? "active" : ""
       }" data-file="${filename}">
         <div class="paper-item-info">
-          <h3>${filename.replace(".md", "").replace(/-/g, " ")}</h3>
+          <h3>${filename.replace(".md", "").replace(/-/g, " ")}${
+          isRecent
+            ? ' <span class="recent-badge" title="Modified recently">🔥</span>'
+            : ""
+        }</h3>
           <p><i class="fas fa-file-alt"></i> ${filename}</p>
         </div>
         <div class="paper-item-actions">
@@ -242,8 +344,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
         </div>
       </li>
-    `
-      )
+    `;
+      })
       .join("");
 
     // Click handlers for paper items
@@ -653,6 +755,162 @@ Brief summary here...
 - Source 1
 - Source 2`,
 
+    clinical: `#clinical #case-study
+
+# Clinical Case Study: [Patient/Condition]
+
+*${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}*
+
+## Patient Background
+
+Age, gender, presenting concerns, relevant history.
+
+## Assessment
+
+### Clinical Interview
+Key findings from interview...
+
+### Diagnostic Criteria
+DSM-5/ICD-11 criteria met...
+
+## Diagnosis
+
+Primary diagnosis with justification.
+
+## Treatment Plan
+
+1. Therapeutic approach
+2. Intervention strategies
+3. Expected outcomes
+
+## Progress & Follow-up
+
+Tracking of treatment progress...
+
+---
+
+**References:**
+
+APA. (2013). *Diagnostic and Statistical Manual of Mental Disorders* (5th ed.).`,
+
+    experiment: `#research #experimental
+
+# Experimental Study: [Title]
+
+*${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}*
+
+## Abstract
+
+Brief overview of the experiment, hypothesis, method, results, and conclusion.
+
+## Introduction
+
+Background literature and theoretical framework. State the hypothesis:
+
+**Hypothesis:** We predict that...
+
+## Method
+
+### Participants
+- Sample size: N = 
+- Demographics:
+- Recruitment:
+
+### Materials
+Describe instruments, questionnaires, equipment...
+
+### Design
+- Independent variable(s):
+- Dependent variable(s):
+- Control variables:
+
+### Procedure
+1. Step-by-step protocol
+2. Data collection process
+3. Ethical considerations
+
+## Results
+
+### Descriptive Statistics
+- Mean: $M = 0.00$, $SD = 0.00$
+- Range: [min, max]
+
+### Inferential Statistics
+- Test used: t-test / ANOVA / etc.
+- Results: $t(df) = 0.00$, $p < .05$
+- Effect size: $d = 0.00$
+
+## Discussion
+
+Interpretation of findings, comparison with literature, limitations.
+
+## Conclusion
+
+Key takeaways and future directions.
+
+---
+
+**References:**
+
+Author, A. A. (Year). Title. *Journal*, Volume(Issue), pages.`,
+
+    summary: `#summary #literature
+
+# Paper Summary: [Original Title]
+
+**Original Authors:** Author et al. (Year)
+
+**Summarized by:** Your Name — ${new Date().toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    })}
+
+---
+
+## Overview
+
+Brief description of the paper's main focus.
+
+## Research Question
+
+What question were the authors trying to answer?
+
+## Methodology
+
+- **Design:** Experimental/Survey/Meta-analysis/etc.
+- **Sample:** Description of participants
+- **Measures:** Key variables and instruments
+
+## Key Findings
+
+1. Finding 1
+2. Finding 2
+3. Finding 3
+
+## Strengths
+
+- Strength 1
+- Strength 2
+
+## Limitations
+
+- Limitation 1
+- Limitation 2
+
+## Implications
+
+What does this mean for theory/practice/future research?
+
+## Personal Notes
+
+Your thoughts, critiques, or connections to other work...
+
+---
+
+**Full Citation:**
+
+Author, A. A., & Author, B. B. (Year). Title of article. *Journal Name*, Volume(Issue), pages. DOI`,
+
     empty: ``,
   };
 
@@ -681,6 +939,51 @@ Brief summary here...
       if (e.key === "Tab") {
         e.preventDefault();
         insertAtCursor("  ");
+      }
+    });
+
+    // Drag and drop file upload
+    editor.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      editor.classList.add("drag-over");
+    });
+
+    editor.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      editor.classList.remove("drag-over");
+    });
+
+    editor.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      editor.classList.remove("drag-over");
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        if (
+          file.name.endsWith(".md") ||
+          file.type === "text/markdown" ||
+          file.type === "text/plain"
+        ) {
+          try {
+            const text = await file.text();
+            editor.value = text;
+            if (filenameInput && !filenameInput.value) {
+              filenameInput.value = file.name;
+            }
+            updatePreview();
+            updateWordCount();
+            setUnsaved(true);
+            showToast(`Loaded ${file.name}`, "success");
+          } catch (error) {
+            showToast("Failed to read file", "error");
+          }
+        } else {
+          showToast("Please drop a .md or .txt file", "error");
+        }
       }
     });
   }
@@ -733,11 +1036,225 @@ Brief summary here...
     } catch (e) {}
   }
 
+  // Export dropdown
+  if (exportBtn && exportMenu) {
+    exportBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      exportMenu.classList.toggle("show");
+      if (templateMenu) templateMenu.classList.remove("show");
+      if (insertMenu) insertMenu.classList.remove("show");
+    });
+  }
+
+  // Export options
+  document
+    .querySelectorAll("#export-menu .dropdown-option")
+    .forEach((option) => {
+      option.addEventListener("click", () => {
+        const format = option.dataset.export;
+        exportPaper(format);
+        if (exportMenu) exportMenu.classList.remove("show");
+      });
+    });
+
+  function exportPaper(format) {
+    if (!editor) return;
+    const content = editor.value;
+    const filename = (filenameInput?.value || "paper").replace(".md", "");
+
+    switch (format) {
+      case "markdown":
+        downloadFile(content, `${filename}.md`, "text/markdown");
+        showToast("Exported as Markdown", "success");
+        break;
+      case "html":
+        const html = marked.parse(content);
+        const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${filename}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+    h1, h2, h3 { margin-top: 2rem; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+        downloadFile(fullHtml, `${filename}.html`, "text/html");
+        showToast("Exported as HTML", "success");
+        break;
+      case "text":
+        downloadFile(content, `${filename}.txt`, "text/plain");
+        showToast("Exported as Plain Text", "success");
+        break;
+      case "pdf":
+        printPaper(content, filename);
+        showToast("Opening print dialog...", "info");
+        break;
+    }
+  }
+
+  function printPaper(content, filename) {
+    // Convert markdown to HTML
+    const html = marked.parse(content);
+
+    // Create a temporary print window
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${filename}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    @media print {
+      @page { margin: 0.75in; }
+    }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+      color: #000;
+      background: #fff;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    h3 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+    p {
+      margin-bottom: 1rem;
+    }
+    em {
+      font-style: italic;
+      color: #666;
+    }
+    strong {
+      font-weight: 600;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    blockquote {
+      border-left: 4px solid #ddd;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #666;
+      font-style: italic;
+    }
+    ul, ol {
+      margin: 1rem 0;
+      padding-left: 2rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+      font-weight: 600;
+    }
+    a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+${html}
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+    // Auto-print after rendering
+    setTimeout(function() {
+      window.print();
+      // Close after printing (user can cancel)
+      setTimeout(function() {
+        window.close();
+      }, 100);
+    }, 500);
+  });
+</script>
+</body>
+</html>
+    `);
+    printWindow.document.close();
+  }
+
+  function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   // Template dropdown
   if (templateBtn && templateMenu) {
     templateBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       templateMenu.classList.toggle("show");
+      if (exportMenu) exportMenu.classList.remove("show");
       if (insertMenu) insertMenu.classList.remove("show");
     });
   }
@@ -836,21 +1353,64 @@ Brief summary here...
     if (!e.target.closest(".dropdown")) {
       if (templateMenu) templateMenu.classList.remove("show");
       if (insertMenu) insertMenu.classList.remove("show");
+      if (exportMenu) exportMenu.classList.remove("show");
     }
   });
 
+  // Theme toggle
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
+  }
+
+  // Font size controls
+  if (fontIncrease) {
+    fontIncrease.addEventListener("click", increaseFontSize);
+  }
+  if (fontDecrease) {
+    fontDecrease.addEventListener("click", decreaseFontSize);
+  }
+
+  // Distraction-free mode
+  if (distractionFree) {
+    distractionFree.addEventListener("click", toggleDistractionFree);
+  }
+
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    // F11 for distraction-free
+    if (e.key === "F11") {
+      e.preventDefault();
+      toggleDistractionFree();
+      return;
+    }
+
     // Escape to close modals
     if (e.key === "Escape") {
       if (shortcutsModal) shortcutsModal.classList.remove("show");
       if (deleteModal) deleteModal.classList.remove("show");
       if (templateMenu) templateMenu.classList.remove("show");
       if (insertMenu) insertMenu.classList.remove("show");
+      if (exportMenu) exportMenu.classList.remove("show");
+      // Exit distraction-free on Escape
+      if (
+        adminContainer &&
+        adminContainer.classList.contains("distraction-free")
+      ) {
+        toggleDistractionFree();
+      }
     }
 
     // Ctrl/Cmd shortcuts
     if (e.ctrlKey || e.metaKey) {
+      // Ctrl+Shift combinations
+      if (e.shiftKey) {
+        if (e.key.toLowerCase() === "t") {
+          e.preventDefault();
+          toggleTheme();
+          return;
+        }
+      }
+
       switch (e.key.toLowerCase()) {
         case "s":
           e.preventDefault();
@@ -859,6 +1419,20 @@ Brief summary here...
         case "n":
           e.preventDefault();
           newPaper();
+          break;
+        case "f":
+          // Allow browser's native find (Ctrl+F)
+          // Don't preventDefault - let browser handle it
+          break;
+        case "=":
+        case "+":
+          e.preventDefault();
+          increaseFontSize();
+          break;
+        case "-":
+        case "_":
+          e.preventDefault();
+          decreaseFontSize();
           break;
         case "b":
           if (document.activeElement === editor) {
@@ -899,6 +1473,10 @@ Brief summary here...
   });
 
   // ============== INITIALIZE ==============
+  // Initialize theme and font size
+  initTheme();
+  updateFontSize();
+
   // Force login screen visible initially
   showLoginScreen();
 

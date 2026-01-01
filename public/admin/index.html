@@ -43,17 +43,38 @@
         --warning: #d4a855;
         --info: #5d9dc9;
       }
+
+      [data-theme="light"] {
+        --bg-body: #f5f5f5;
+        --bg-card: #ffffff;
+        --bg-input: #fafafa;
+        --text-main: #1a1a1a;
+        --text-muted: #6b6b6b;
+        --text-light: #4a4a4a;
+        --accent: #c9785d;
+        --accent-hover: #e08b6d;
+        --line: #e0e0e0;
+        --line-light: #ebebeb;
+        --success: #5a8a4d;
+        --danger: #c75d5d;
+        --warning: #d4a855;
+        --info: #5d9dc9;
+      }
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
       }
       body {
         background: var(--bg-body);
         color: var(--text-main);
         font-family: "Inter", sans-serif;
         line-height: 1.6;
-        min-height: 100vh;
       }
 
       /* Login */
@@ -229,9 +250,10 @@
 
       /* Admin Layout */
       .admin-app {
-        min-height: 100vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
       }
       .admin-header {
         background: var(--bg-card);
@@ -289,6 +311,7 @@
         grid-template-columns: 280px 1fr;
         flex: 1;
         min-height: 0;
+        overflow: hidden;
       }
       .admin-container.sidebar-collapsed {
         grid-template-columns: 0 1fr;
@@ -444,6 +467,8 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        flex: 1;
+        min-height: 0;
       }
       .editor-toolbar {
         padding: 0.75rem 1rem;
@@ -453,6 +478,7 @@
         gap: 0.75rem;
         align-items: center;
         flex-wrap: wrap;
+        flex-shrink: 0;
       }
       .input-group {
         display: flex;
@@ -601,6 +627,7 @@
         background: var(--bg-card);
         border-bottom: 1px solid var(--line);
         overflow-x: auto;
+        flex-shrink: 0;
       }
       .quick-insert button {
         background: var(--bg-input);
@@ -624,6 +651,7 @@
         grid-template-columns: 1fr 1fr;
         flex: 1;
         overflow: hidden;
+        min-height: 0;
       }
       .editor-content.preview-only {
         grid-template-columns: 0 1fr;
@@ -651,6 +679,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-shrink: 0;
       }
       .pane-header i {
         color: var(--accent);
@@ -821,6 +850,38 @@
         justify-content: center;
       }
 
+      /* Distraction-Free Mode */
+      .admin-container.distraction-free .sidebar,
+      .distraction-free .admin-header,
+      .distraction-free .editor-toolbar,
+      .distraction-free .quick-insert {
+        display: none !important;
+      }
+      .admin-container.distraction-free {
+        grid-template-columns: 1fr;
+        height: 100vh;
+      }
+      .admin-container.distraction-free .editor-area {
+        height: 100vh;
+      }
+      .admin-container.distraction-free .editor-content {
+        height: 100%;
+      }
+      .admin-container.distraction-free textarea#markdown-editor {
+        padding: 3rem;
+        font-size: 1rem;
+      }
+      .admin-container.distraction-free .preview-content {
+        padding: 3rem;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Syntax Highlighting for Editor */
+      .editor-textarea {
+        font-family: "Fira Code", "Courier New", monospace !important;
+      }
+
       /* Responsive */
       @media (max-width: 900px) {
         .admin-container {
@@ -898,6 +959,34 @@
           </div>
           <button
             class="btn-icon"
+            id="font-decrease"
+            title="Decrease Font Size (Ctrl+-)"
+          >
+            <i class="fas fa-minus"></i>
+          </button>
+          <button
+            class="btn-icon"
+            id="font-increase"
+            title="Increase Font Size (Ctrl++)"
+          >
+            <i class="fas fa-plus"></i>
+          </button>
+          <button
+            class="btn-icon"
+            id="theme-toggle"
+            title="Toggle Theme (Ctrl+Shift+T)"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+          <button
+            class="btn-icon"
+            id="distraction-free"
+            title="Distraction Free (F11)"
+          >
+            <i class="fas fa-expand"></i>
+          </button>
+          <button
+            class="btn-icon"
             id="shortcuts-btn"
             title="Keyboard Shortcuts"
           >
@@ -965,9 +1054,39 @@
                 <button class="dropdown-option" data-template="notes">
                   <i class="fas fa-sticky-note"></i> Quick Notes
                 </button>
+                <button class="dropdown-option" data-template="clinical">
+                  <i class="fas fa-user-md"></i> Clinical Case Study
+                </button>
+                <button class="dropdown-option" data-template="experiment">
+                  <i class="fas fa-vial"></i> Experiment Report
+                </button>
+                <button class="dropdown-option" data-template="summary">
+                  <i class="fas fa-list"></i> Paper Summary
+                </button>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-option" data-template="empty">
                   <i class="fas fa-file-medical"></i> Empty Document
+                </button>
+              </div>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-secondary" id="export-btn">
+                <i class="fas fa-download"></i> Export
+              </button>
+              <div class="dropdown-menu" id="export-menu">
+                <button class="dropdown-option" data-export="markdown">
+                  <i class="fas fa-file-code"></i> Markdown (.md)
+                </button>
+                <button class="dropdown-option" data-export="html">
+                  <i class="fas fa-file-code"></i> HTML
+                </button>
+                <button class="dropdown-option" data-export="text">
+                  <i class="fas fa-file-alt"></i> Plain Text
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-option" data-export="pdf">
+                  <i class="fas fa-file-pdf"></i> PDF (Print)
                 </button>
               </div>
             </div>
@@ -1143,13 +1262,16 @@ Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
             "
           >
             <div><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</div>
+            <div><kbd>Ctrl</kbd>+<kbd>N</kbd> New Paper</div>
             <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Bold</div>
             <div><kbd>Ctrl</kbd>+<kbd>I</kbd> Italic</div>
             <div><kbd>Ctrl</kbd>+<kbd>K</kbd> Insert Link</div>
-            <div><kbd>Ctrl</kbd>+<kbd>N</kbd> New Paper</div>
-            <div><kbd>Ctrl</kbd>+<kbd>D</kbd> Duplicate</div>
-            <div><kbd>Ctrl</kbd>+<kbd>/</kbd> Toggle Preview</div>
-            <div><kbd>Ctrl</kbd>+<kbd>\</kbd> Toggle Sidebar</div>
+            <div><kbd>Ctrl</kbd>+<kbd>F</kbd> Find</div>
+            <div><kbd>Ctrl</kbd>+<kbd>+</kbd> Bigger Font</div>
+            <div><kbd>Ctrl</kbd>+<kbd>-</kbd> Smaller Font</div>
+            <div><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> Theme</div>
+            <div><kbd>F11</kbd> Distraction Free</div>
+            <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Toggle Sidebar</div>
             <div><kbd>Esc</kbd> Close Modals</div>
           </div>
           <div class="modal-actions" style="margin-top: 1.5rem">
