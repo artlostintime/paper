@@ -1,0 +1,93 @@
+@use "../abstracts" as *;
+
+/* ── Modals ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: $z-modal;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $ease-fast;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.modal {
+  @include glass($radius-xl);
+  background: var(--bg-elevated);
+  max-width: 420px;
+  width: 90vw;
+  padding: $space-xl;
+  transform: scale(0.95) translateY(10px);
+  transition: transform $ease-normal;
+
+  .modal-overlay.active & {
+    transform: scale(1) translateY(0);
+  }
+
+  h3 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: $space-sm;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    text-align: center;
+    margin-bottom: $space-lg;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: $space-sm;
+}
+
+/* ── Shortcuts Modal ── */
+.shortcuts-modal {
+  max-width: 580px;
+}
+
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-lg;
+  margin-bottom: $space-lg;
+
+  @include respond-to($bp-mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shortcut-group {
+  h4 {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: $space-sm;
+  }
+
+  div {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 4px 0;
+  }
+}

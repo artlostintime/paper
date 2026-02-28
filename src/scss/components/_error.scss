@@ -1,0 +1,50 @@
+@use "../abstracts" as *;
+
+/* ── Error / 404 / Empty States ── */
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: $space-3xl $space-xl;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.error-icon,
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: $space-md;
+  opacity: 0.4;
+}
+
+.error-title,
+.empty-title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: $space-sm;
+}
+
+.error-message,
+.empty-message {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: $space-xl;
+}
+
+.no-results {
+  text-align: center;
+  padding: $space-2xl $space-lg;
+
+  .no-results-icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+    margin-bottom: $space-sm;
+  }
+
+  .no-results-text {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+}

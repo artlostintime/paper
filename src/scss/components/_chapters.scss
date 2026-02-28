@@ -1,0 +1,48 @@
+@use "../abstracts" as *;
+
+.chapter {
+  margin-bottom: $space-2xl;
+}
+
+.chapter-number {
+  @include label;
+  color: var(--accent);
+  display: inline-block;
+  margin-bottom: $space-sm;
+}
+
+.chapter-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: $space-xl;
+  color: var(--text-primary);
+}
+
+.lead-text {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: $space-md;
+  line-height: 1.85;
+}
+
+.section-intro {
+  color: var(--text-secondary);
+  margin-bottom: $space-lg;
+  line-height: 1.85;
+}
+
+.section-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-strong) 20%,
+    var(--border-strong) 80%,
+    transparent
+  );
+  margin: $space-4xl 0;
+}

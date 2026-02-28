@@ -1,0 +1,115 @@
+@use "../abstracts" as *;
+
+/* ── Zen Toolbar (hidden by default, shown in distraction-free mode) ── */
+.zen-toolbar {
+  display: none;
+}
+
+/* ── Distraction-Free / Zen Mode ── */
+.distraction-free {
+  .titlebar,
+  .activity-bar,
+  .side-panel,
+  .sash,
+  .status-bar,
+  .tab-bar,
+  .breadcrumb-bar,
+  .quick-format,
+  .pane-label,
+  .split-sash {
+    display: none !important;
+  }
+
+  .workbench {
+    display: block;
+  }
+
+  .editor-group {
+    height: 100vh;
+  }
+
+  .editor-content {
+    height: 100%;
+  }
+
+  .editor-pane {
+    border-right: none;
+  }
+
+  .line-numbers {
+    display: none;
+  }
+
+  #markdown-editor {
+    padding: $space-2xl;
+    max-width: $content-max-width;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  /* Preview pane in zen mode */
+  .preview-pane {
+    .pane-label {
+      display: none !important;
+    }
+  }
+
+  .preview-content {
+    padding: $space-2xl;
+    max-width: $content-max-width;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  /* Zen-mode floating toolbar for view switching */
+  .zen-toolbar {
+    position: fixed;
+    top: $space-md;
+    right: $space-md;
+    display: flex;
+    gap: 4px;
+    z-index: 100;
+    @include glass($radius-sm);
+    padding: 4px;
+    opacity: 0;
+    transition: opacity $ease-fast;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    button {
+      @include flex-center;
+      width: 32px;
+      height: 28px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all $ease-fast;
+
+      &:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      &.active {
+        background: rgba(212, 168, 83, 0.15);
+        color: var(--accent);
+      }
+    }
+  }
+}
+
+/* Show zen toolbar on mouse near top-right */
+.distraction-free:hover .zen-toolbar {
+  opacity: 0.6;
+}
+
+.distraction-free .zen-toolbar:hover {
+  opacity: 1 !important;
+}

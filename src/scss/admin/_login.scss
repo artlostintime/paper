@@ -1,0 +1,113 @@
+@use "../abstracts" as *;
+
+/* ── Login Screen ── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-body);
+  z-index: $z-loader;
+}
+
+.login-card {
+  @include glass($radius-xl);
+  width: 380px;
+  max-width: 90vw;
+  padding: $space-2xl;
+  text-align: center;
+}
+
+.login-header {
+  margin-bottom: $space-xl;
+
+  i {
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: $space-sm;
+    display: block;
+  }
+
+  h2 {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+}
+
+.login-input-group {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-md;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  transition: border-color $ease-fast;
+
+  &:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  > i {
+    color: var(--text-muted);
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    outline: none;
+  }
+}
+
+.toggle-password {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  transition: color $ease-fast;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.login-error {
+  font-size: 0.8rem;
+  color: var(--danger);
+  min-height: 1.5em;
+  margin-top: $space-xs;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: $space-md;
+}
+
+.login-footer {
+  margin-top: $space-xl;
+
+  a {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color $ease-fast;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}

@@ -293,7 +293,7 @@ async function loadPaperList() {
       }
     }
 
-    const response = await fetch('/api/papers');
+    const response = await fetch("/api/papers");
     if (!response.ok) throw new Error("Could not fetch paper list");
     const data = await response.json();
 
@@ -413,9 +413,11 @@ async function renderPapers(filesToRender) {
 
       // Remove YAML frontmatter (everything between --- delimiters at start)
       if (markdownText.trimStart().startsWith("---")) {
-        const yamlEndIndex = markdownText.indexOf("\n---", 4);
-        if (yamlEndIndex !== -1) {
-          markdownText = markdownText.substring(yamlEndIndex + 4).trim();
+        const yamlEndMatch = markdownText.match(/\n---\s*\n/);
+        if (yamlEndMatch) {
+          markdownText = markdownText
+            .substring(yamlEndMatch.index + yamlEndMatch[0].length)
+            .trim();
         }
       }
 
@@ -676,14 +678,29 @@ const timelineHint = document.getElementById("timeline-hint");
 
 if (timelineContainer) {
   let isDown = false;
-  let startY;
-  let scrollTop;
+  let startX;
+  let scrollLeft;
+
+  // Edge shadow state management
+  const timelineWrapper = timelineContainer.closest(".timeline-wrapper");
+
+  function updateEdgeShadows() {
+    if (!timelineWrapper) return;
+    const { scrollLeft, scrollWidth, clientWidth } = timelineContainer;
+    const atStart = scrollLeft <= 2;
+    const atEnd = scrollLeft + clientWidth >= scrollWidth - 2;
+    timelineWrapper.classList.toggle("at-start", atStart);
+    timelineWrapper.classList.toggle("at-end", atEnd);
+  }
+
+  // Set initial shadow state
+  updateEdgeShadows();
 
   timelineContainer.addEventListener("mousedown", (e) => {
     isDown = true;
     timelineContainer.classList.add("dragging");
-    startY = e.pageY - timelineContainer.offsetTop;
-    scrollTop = timelineContainer.scrollTop;
+    startX = e.pageX - timelineContainer.offsetLeft;
+    scrollLeft = timelineContainer.scrollLeft;
   });
 
   timelineContainer.addEventListener("mouseleave", () => {
@@ -699,20 +716,20 @@ if (timelineContainer) {
   timelineContainer.addEventListener("mousemove", (e) => {
     if (!isDown) return;
     e.preventDefault();
-    const y = e.pageY - timelineContainer.offsetTop;
-    const walk = (y - startY) * 2;
-    timelineContainer.scrollTop = scrollTop - walk;
+    const x = e.pageX - timelineContainer.offsetLeft;
+    const walk = (x - startX) * 2;
+    timelineContainer.scrollLeft = scrollLeft - walk;
   });
 
   // Touch support for mobile
-  let touchStartY;
-  let touchScrollTop;
+  let touchStartX;
+  let touchScrollLeft;
 
   timelineContainer.addEventListener(
     "touchstart",
     (e) => {
-      touchStartY = e.touches[0].pageY - timelineContainer.offsetTop;
-      touchScrollTop = timelineContainer.scrollTop;
+      touchStartX = e.touches[0].pageX - timelineContainer.offsetLeft;
+      touchScrollLeft = timelineContainer.scrollLeft;
     },
     { passive: true },
   );
@@ -720,23 +737,26 @@ if (timelineContainer) {
   timelineContainer.addEventListener(
     "touchmove",
     (e) => {
-      const y = e.touches[0].pageY - timelineContainer.offsetTop;
-      const walk = (y - touchStartY) * 1.5;
-      timelineContainer.scrollTop = touchScrollTop - walk;
+      const x = e.touches[0].pageX - timelineContainer.offsetLeft;
+      const walk = (x - touchStartX) * 1.5;
+      timelineContainer.scrollLeft = touchScrollLeft - walk;
     },
     { passive: true },
   );
 
-  // Hide hint when scrolled to bottom
+  // Hide hint when scrolled to end + update edge shadows
   if (timelineHint) {
     timelineContainer.addEventListener("scroll", () => {
-      const { scrollTop, scrollHeight, clientHeight } = timelineContainer;
-      if (scrollTop + clientHeight >= scrollHeight - 20) {
+      const { scrollLeft, scrollWidth, clientWidth } = timelineContainer;
+      if (scrollLeft + clientWidth >= scrollWidth - 20) {
         timelineHint.classList.add("hidden");
       } else {
         timelineHint.classList.remove("hidden");
       }
+      updateEdgeShadows();
     });
+  } else {
+    timelineContainer.addEventListener("scroll", updateEdgeShadows);
   }
 }
 
@@ -763,7 +783,7 @@ if (copyEmailBtn) {
 }
 
 // --- DYNAMIC FOOTER YEAR ---
-const footerYear = document.getElementById('footer-year');
+const footerYear = document.getElementById("footer-year");
 if (footerYear) {
   const currentYear = new Date().getFullYear();
   footerYear.innerHTML = `\u00A9 2024\u2013${currentYear}`;

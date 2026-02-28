@@ -1,0 +1,73 @@
+@use "../abstracts" as *;
+
+/* ── Technical Section ── */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $space-lg;
+  margin: $space-xl 0;
+}
+
+.tech-category {
+  @include card($radius-lg);
+  padding: $space-lg;
+  transition: all $ease-fast;
+
+  &:hover {
+    @include hover-lift;
+    border-color: var(--accent);
+  }
+}
+
+.tech-label {
+  @include label;
+  color: var(--accent);
+  display: block;
+  margin-bottom: $space-sm;
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tech-tag {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  color: var(--text-primary);
+  transition: all $ease-fast;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+/* ── GitHub Link ── */
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-full;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all $ease-fast;
+  margin-top: $space-lg;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+}

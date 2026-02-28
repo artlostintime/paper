@@ -1,0 +1,57 @@
+/* ── Admin Base Variables ── */
+:root {
+  /* VS Code–inspired layout tokens */
+  --titlebar-height: 38px;
+  --activity-bar-width: 42px;
+  --side-panel-width: 260px;
+  --status-bar-height: 26px;
+  --tab-bar-height: 36px;
+  --breadcrumb-height: 30px;
+  --quick-format-height: 32px;
+
+  /* Admin-specific palette */
+  --status-bar-bg: #1e1e22;
+  --status-bar-active: rgba(212, 168, 83, 0.14);
+
+  /* Semantic colors for admin */
+  --success: #81c784;
+  --danger: #e57373;
+  --warning: #ffb74d;
+  --info: #64b5f6;
+}
+
+/* Admin body reset */
+body {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}

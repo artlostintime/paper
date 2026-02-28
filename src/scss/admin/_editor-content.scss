@@ -1,0 +1,577 @@
+@use "../abstracts" as *;
+
+/* ── Editor Content (Split View) ── */
+.editor-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+
+  &.editor-only {
+    .preview-pane,
+    .split-sash {
+      display: none;
+    }
+  }
+
+  &.preview-only {
+    .editor-pane,
+    .split-sash {
+      display: none;
+    }
+  }
+}
+
+.editor-pane,
+.preview-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.editor-pane {
+  border-right: 1px solid var(--border);
+}
+
+.pane-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  min-height: 22px;
+
+  i {
+    font-size: 0.58rem;
+    opacity: 0.6;
+  }
+}
+
+/* ── Find & Replace Widget ── */
+.find-replace-widget {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  &.open {
+    display: flex;
+  }
+}
+
+.fr-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fr-replace-row {
+  display: none;
+
+  .find-replace-widget.show-replace & {
+    display: flex;
+  }
+}
+
+.fr-input {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  outline: none;
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(212, 168, 83, 0.25);
+  }
+}
+
+.fr-btn {
+  @include flex-center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background $ease-fast,
+    color $ease-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  &.active {
+    background: rgba(212, 168, 83, 0.15);
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+
+  i {
+    font-size: 0.6rem;
+  }
+}
+
+.fr-close {
+  margin-left: auto;
+}
+
+.fr-count {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding: 0 4px;
+  min-width: 55px;
+  text-align: center;
+}
+
+/* ── Editor with Line Numbers ── */
+.editor-scroll {
+  flex: 1;
+  display: flex;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-body);
+}
+
+.line-numbers {
+  width: 42px;
+  flex-shrink: 0;
+  padding: $space-md 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  opacity: 0.35;
+  user-select: none;
+  border-right: 1px solid var(--border);
+
+  div {
+    padding-right: 8px;
+    height: calc(0.78rem * 1.7);
+  }
+}
+
+/* ── Editor Input Wrap (overlay technique) ── */
+.editor-input-wrap {
+  flex: 1;
+  position: relative;
+  display: grid;
+  min-width: 0;
+
+  > * {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+}
+
+.syntax-highlight {
+  margin: 0;
+  padding: $space-md;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  tab-size: 2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  pointer-events: none;
+  color: transparent;
+  z-index: 0;
+
+  code {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    color: var(--text-muted);
+  }
+}
+
+/* ── Textarea ── */
+#markdown-editor {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100%;
+  padding: $space-md;
+  border: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--accent);
+  -webkit-text-fill-color: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+  overflow: hidden;
+
+  &::placeholder {
+    color: var(--text-muted);
+    -webkit-text-fill-color: var(--text-muted);
+    opacity: 0.4;
+    font-size: 0.78rem;
+  }
+}
+
+/* ── Markdown Syntax Highlight Tokens ── */
+.syntax-highlight code {
+  .md-heading {
+    color: #e2b750;
+    font-weight: 600;
+  }
+  .md-bold {
+    color: #d4a853;
+    font-weight: 700;
+  }
+  .md-italic {
+    color: #c4b5a0;
+    font-style: italic;
+  }
+  .md-bold-italic {
+    color: #d4a853;
+    font-weight: 700;
+    font-style: italic;
+  }
+  .md-code-inline {
+    color: #8db8d8;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  .md-code-block {
+    color: #8db8d8;
+  }
+  .md-code-lang {
+    color: #6eb586;
+  }
+  .md-blockquote {
+    color: #8a8a70;
+  }
+  .md-link-text {
+    color: #6eb586;
+  }
+  .md-link-url {
+    color: #5d8cb8;
+    text-decoration: underline;
+    text-decoration-color: rgba(93, 140, 184, 0.3);
+  }
+  .md-image {
+    color: #b78ed7;
+  }
+  .md-list-marker {
+    color: #d4a853;
+    font-weight: 600;
+  }
+  .md-hr {
+    color: #555;
+  }
+  .md-html-tag {
+    color: #569cd6;
+  }
+  .md-escape {
+    color: #9a7350;
+  }
+  .md-strikethrough {
+    color: #888;
+    text-decoration: line-through;
+  }
+  .md-math {
+    color: #b78ed7;
+  }
+  .md-frontmatter {
+    color: #8a8a70;
+    font-style: italic;
+  }
+  .md-table-sep {
+    color: #555;
+  }
+}
+
+/* ── Autocomplete Dropdown ── */
+.md-autocomplete {
+  position: absolute;
+  z-index: 100;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  min-width: 220px;
+  max-width: 340px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px 0;
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+
+  &.active {
+    display: block;
+  }
+
+  .ac-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.1s;
+
+    &:hover,
+    &.selected {
+      background: rgba(212, 168, 83, 0.1);
+      color: var(--text-primary);
+    }
+
+    .ac-icon {
+      width: 18px;
+      text-align: center;
+      color: var(--accent);
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    .ac-label {
+      flex: 1;
+      @include truncate;
+    }
+
+    .ac-hint {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+  }
+}
+
+/* ── Split Sash ── */
+.split-sash {
+  width: 3px;
+  cursor: col-resize;
+  flex-shrink: 0;
+  z-index: 5;
+  transition: background $ease-fast;
+
+  &:hover,
+  &.dragging {
+    background: rgba(212, 168, 83, 0.4);
+  }
+}
+
+/* ── Preview ── */
+.preview-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-md $space-lg;
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
+    line-height: 1.3;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-soft);
+    text-underline-offset: 2px;
+    &:hover {
+      text-decoration-color: var(--accent);
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: $space-sm $space-lg;
+    background: var(--accent-soft);
+    border-radius: 0 $radius-sm $radius-sm 0;
+    margin: 1em 0;
+    color: var(--text-secondary);
+  }
+
+  pre {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: $space-sm $space-md;
+    overflow-x: auto;
+    font-size: 0.78rem;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: $radius-md;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: var(--bg-surface);
+      font-weight: 600;
+      text-align: left;
+    }
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--border-strong) 20%,
+      var(--border-strong) 80%,
+      transparent
+    );
+    margin: 2em 0;
+  }
+
+  /* KaTeX */
+  .katex-display {
+    margin: 1em 0;
+    overflow-x: auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: $space-2xl $space-xl;
+    color: var(--text-muted);
+
+    i {
+      font-size: 2rem;
+      opacity: 0.2;
+      margin-bottom: $space-sm;
+      display: block;
+    }
+
+    h3 {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin: 0 0 $space-xs;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  }
+
+  .shortcuts-hint {
+    margin-top: $space-sm;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+  }
+}
+
+/* ── Mobile Preview Toggle ── */
+.mobile-preview-toggle {
+  display: none;
+  position: absolute;
+  bottom: $space-lg;
+  right: $space-lg;
+  @include glass($radius-full);
+  width: 44px;
+  height: 44px;
+  @include flex-center;
+  cursor: pointer;
+  z-index: 5;
+  color: var(--accent);
+  font-size: 1rem;
+
+  @include respond-to($bp-tablet) {
+    display: flex;
+  }
+}
+
+/* Mobile show-preview state */
+@include respond-to($bp-tablet) {
+  .editor-content.show-preview {
+    .editor-pane {
+      display: none;
+    }
+    .preview-pane {
+      display: flex;
+    }
+  }
+}

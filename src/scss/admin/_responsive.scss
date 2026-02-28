@@ -1,0 +1,78 @@
+@use "../abstracts" as *;
+
+/* ── Admin Responsive ── */
+
+/* Tablet */
+@include respond-to($bp-tablet) {
+  .titlebar-center {
+    display: none;
+  }
+
+  .activity-bar {
+    width: 36px;
+  }
+
+  .activity-btn {
+    width: 36px;
+    height: 34px;
+    font-size: 0.85rem;
+  }
+
+  .side-panel {
+    position: fixed;
+    left: 36px;
+    top: var(--titlebar-height);
+    bottom: var(--status-bar-height);
+    z-index: 20;
+    box-shadow: var(--shadow-lg);
+
+    &.collapsed {
+      transform: translateX(-100%);
+      width: var(--side-panel-width);
+    }
+  }
+
+  .sash.vertical {
+    display: none;
+  }
+
+  .breadcrumb-actions {
+    display: none;
+  }
+
+  .quick-format {
+    display: none;
+  }
+
+  /* Stack panes vertically */
+  .editor-content {
+    flex-direction: column;
+  }
+
+  .editor-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .split-sash {
+    display: none;
+  }
+}
+
+/* Mobile */
+@include respond-to($bp-mobile) {
+  .titlebar-title {
+    display: none;
+  }
+
+  .view-toggle {
+    display: none;
+  }
+
+  .status-right
+    .status-item:not(.save-status):not(#font-decrease):not(#font-increase):not(
+      #font-size-label
+    ) {
+    display: none;
+  }
+}

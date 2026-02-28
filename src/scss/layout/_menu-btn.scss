@@ -1,0 +1,52 @@
+@use "../abstracts" as *;
+
+.menu-btn {
+  position: fixed;
+  top: $space-xl;
+  left: $space-xl;
+  @include glass($radius-full);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  z-index: $z-menu-btn;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 10px 20px;
+  box-shadow: var(--shadow-md);
+  transition:
+    all $ease-normal,
+    transform $ease-spring;
+  letter-spacing: 0.02em;
+
+  i {
+    font-size: 0.85rem;
+    transition: transform $ease-normal;
+  }
+
+  &:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow:
+      var(--shadow-lg),
+      0 0 30px var(--accent-glow);
+    transform: scale(1.04);
+
+    i {
+      transform: rotate(90deg);
+    }
+  }
+
+  @include respond-to($bp-tablet) {
+    top: $space-lg;
+    left: $space-lg;
+    padding: 10px 16px;
+
+    span {
+      display: none;
+    }
+  }
+}

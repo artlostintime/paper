@@ -1,0 +1,72 @@
+@use "../abstracts" as *;
+
+/* ── Papers Controls ── */
+.papers-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-sm;
+  margin-bottom: $space-xl;
+}
+
+/* ── Generic Button ── */
+.btn-text {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-full;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all $ease-fast;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  &.active,
+  &[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: var(--shadow-glow);
+  }
+}
+
+/* ── Publication / CTA Button ── */
+.btn-wrapper {
+  text-align: center;
+  margin: $space-xl 0;
+}
+
+.publication-btn,
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 12px 28px;
+  border: none;
+  border-radius: $radius-full;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: all $ease-fast;
+
+  &:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

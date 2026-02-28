@@ -222,40 +222,45 @@ buildSearchIndex();
 // Auto-rebuild search index when papers change on disk (e.g. git pull)
 try {
   fs.watch(PAPERS_DIR, { persistent: false }, (eventType, filename) => {
-    if (filename && filename.endsWith('.md')) {
+    if (filename && filename.endsWith(".md")) {
       invalidateIndex(filename);
     }
   });
-  console.log('👁️  Watching papers directory for changes');
+  console.log("👁️  Watching papers directory for changes");
 } catch (e) {
-  console.warn('⚠️  Could not watch papers directory:', e.message);
+  console.warn("⚠️  Could not watch papers directory:", e.message);
 }
 
 // ============== SESSION & RATE-LIMIT CLEANUP ==============
 // Prune expired sessions and stale login attempts every 30 minutes
-setInterval(() => {
-  const now = Date.now();
-  let sessionsPruned = 0;
-  let attemptsPruned = 0;
+setInterval(
+  () => {
+    const now = Date.now();
+    let sessionsPruned = 0;
+    let attemptsPruned = 0;
 
-  for (const [token, session] of sessions) {
-    if (now > session.expires) {
-      sessions.delete(token);
-      sessionsPruned++;
+    for (const [token, session] of sessions) {
+      if (now > session.expires) {
+        sessions.delete(token);
+        sessionsPruned++;
+      }
     }
-  }
 
-  for (const [ip, attempts] of loginAttempts) {
-    if (attempts.lockoutUntil > 0 && now >= attempts.lockoutUntil) {
-      loginAttempts.delete(ip);
-      attemptsPruned++;
+    for (const [ip, attempts] of loginAttempts) {
+      if (attempts.lockoutUntil > 0 && now >= attempts.lockoutUntil) {
+        loginAttempts.delete(ip);
+        attemptsPruned++;
+      }
     }
-  }
 
-  if (sessionsPruned || attemptsPruned) {
-    console.log(`🧹 Cleanup: ${sessionsPruned} expired sessions, ${attemptsPruned} stale lockouts removed`);
-  }
-}, 30 * 60 * 1000);
+    if (sessionsPruned || attemptsPruned) {
+      console.log(
+        `🧹 Cleanup: ${sessionsPruned} expired sessions, ${attemptsPruned} stale lockouts removed`,
+      );
+    }
+  },
+  30 * 60 * 1000,
+);
 
 // ============== EXPRESS APP ==============
 const app = express();
@@ -443,7 +448,10 @@ app.get("/api/auth/check", (req, res) => {
 
 // Serve the category map so frontend doesn't need its own copy
 app.get("/api/categories", (req, res) => {
-  res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  res.set(
+    "Cache-Control",
+    "public, max-age=3600, stale-while-revalidate=86400",
+  );
   res.json(CATEGORY_MAP);
 });
 
@@ -493,7 +501,7 @@ app.get("/api/papers", async (req, res) => {
         break;
     }
 
-    res.set('Cache-Control', 'public, max-age=10, stale-while-revalidate=30');
+    res.set("Cache-Control", "public, max-age=10, stale-while-revalidate=30");
     res.json({
       files: filesWithStats.map((f) => f.name),
       metadata,
@@ -563,7 +571,7 @@ app.get("/api/papers/search", (req, res) => {
     results.push(file);
   }
 
-  res.set('Cache-Control', 'public, max-age=5, stale-while-revalidate=15');
+  res.set("Cache-Control", "public, max-age=5, stale-while-revalidate=15");
   res.json({ files: results });
 });
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
@@ -61,21 +61,45 @@
           <i class="fas fa-print"></i>
           <span>Print</span>
         </button>
+
+        <!-- Share Dropdown -->
+        <div id="share-dropdown" class="share-dropdown">
+          <button id="copy-link" class="share-option">
+            <i class="fas fa-link"></i> Copy Link
+          </button>
+          <a id="share-twitter" class="share-option" href="#" target="_blank">
+            <i class="fab fa-twitter"></i> Twitter
+          </a>
+          <a id="share-linkedin" class="share-option" href="#" target="_blank">
+            <i class="fab fa-linkedin"></i> LinkedIn
+          </a>
+        </div>
+
+        <!-- Cite Dropdown -->
+        <div id="cite-dropdown" class="cite-dropdown">
+          <div class="cite-dropdown-header">
+            <span>Citation Format</span>
+          </div>
+          <div class="cite-formats">
+            <button class="cite-format-btn active" data-format="apa">
+              APA 7th
+            </button>
+            <button class="cite-format-btn" data-format="mla">MLA 9th</button>
+            <button class="cite-format-btn" data-format="chicago">
+              Chicago
+            </button>
+            <button class="cite-format-btn" data-format="harvard">
+              Harvard
+            </button>
+            <button class="cite-format-btn" data-format="bibtex">BibTeX</button>
+          </div>
+          <div id="cite-preview" class="cite-preview"></div>
+          <button id="cite-copy-btn" class="cite-copy-btn">
+            <i class="fas fa-copy"></i> Copy Citation
+          </button>
+        </div>
       </div>
     </header>
-
-    <!-- Share Dropdown -->
-    <div id="share-dropdown" class="share-dropdown">
-      <button id="copy-link" class="share-option">
-        <i class="fas fa-link"></i> Copy Link
-      </button>
-      <a id="share-twitter" class="share-option" href="#" target="_blank">
-        <i class="fab fa-twitter"></i> Twitter
-      </a>
-      <a id="share-linkedin" class="share-option" href="#" target="_blank">
-        <i class="fab fa-linkedin"></i> LinkedIn
-      </a>
-    </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>

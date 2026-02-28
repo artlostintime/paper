@@ -1,7 +1,17 @@
+---
+title: "burnout"
+author: "Your Name"
+date: "2026-02-28"
+category: "general"
+tags: ["research", "psychology"]
+description: "Brief paper description"
+published: true
+---
+
 # Clinical Interactions & Emotional Fatigue
 
 _Principal Investigator • In Development_
-
+---
 #burnout #healthcare #MBI #mixed-methods #emotional-fatigue
 
 Developing mixed-methods protocol (Target $N=180$) to identify protective relational factors against burnout.
@@ -15,4 +25,4 @@ This study utilizes the Maslach Burnout Inventory (**MBI-HSS**).
 **Reference:**  
 Sharma, V. (2024). Clinical interactions and emotional fatigue in helping professions: A mixed-methods protocol. _Journal of Occupational Health Psychology_. Advance online publication. https://doi.org/10.1234/example
 
-[Read Full Article](https://doi.org/10.1234/example)
+[Read Full Article](https://doi.org/10---------------------.1234/example)

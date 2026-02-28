@@ -1,0 +1,178 @@
+@use "../abstracts" as *;
+
+// ── Full paper view ─────────────────────────────
+.paper-full {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: $space-xl;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: $space-sm;
+    color: var(--text-primary);
+  }
+
+  > p:first-of-type {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: $space-xl;
+    padding-bottom: $space-lg;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: $space-2xl 0 $space-md;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin-bottom: $space-lg;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  ul,
+  ol {
+    margin: $space-md 0 $space-lg $space-lg;
+    color: var(--text-secondary);
+  }
+
+  li {
+    margin-bottom: $space-sm;
+    line-height: 1.75;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  blockquote {
+    border-left: 3px solid var(--accent);
+    margin: $space-lg 0;
+    padding: $space-sm $space-lg;
+    background: var(--accent-soft);
+    border-radius: 0 $radius-sm $radius-sm 0;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--bg-surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  pre {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    padding: $space-lg;
+    overflow-x: auto;
+    margin: $space-lg 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+}
+
+// ── Paper header bar ────────────────────────────
+.paper-header {
+  @include flex-between;
+  padding: $space-md $space-xl;
+  position: sticky;
+  top: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: $z-header;
+
+  .back-link {
+    padding: 0;
+  }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: $space-lg $space-xl;
+  transition: all $ease-fast;
+
+  i {
+    transition: transform $ease-fast;
+  }
+
+  &:hover {
+    color: var(--accent);
+
+    i {
+      transform: translateX(-3px);
+    }
+  }
+}
+
+.paper-actions {
+  display: flex;
+  gap: $space-sm;
+  position: relative;
+}
+
+.action-btn {
+  @include glass($radius-sm);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all $ease-fast;
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  span {
+    display: none;
+  }
+
+  @include respond-above($bp-tablet) {
+    span {
+      display: inline;
+    }
+  }
+}
+
+// ── Reading progress ────────────────────────────
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  width: 0%;
+  z-index: $z-progress;
+  transition: width 0.1s linear;
+}

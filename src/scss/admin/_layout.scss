@@ -1,0 +1,196 @@
+@use "../abstracts" as *;
+
+/* ── Admin App Shell ── */
+.admin-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Title Bar ── */
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--titlebar-height);
+  padding: 0 10px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.titlebar-icon {
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+
+.titlebar-title {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  @include truncate;
+}
+
+.titlebar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 $space-lg;
+  min-width: 0;
+}
+
+.command-trigger {
+  @include flex-center;
+  gap: 8px;
+  max-width: 420px;
+  width: 100%;
+  padding: 4px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition:
+    border-color $ease-fast,
+    background $ease-fast;
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  span {
+    flex: 1;
+    text-align: left;
+    @include truncate;
+  }
+
+  kbd {
+    font-size: 0.62rem;
+    opacity: 0.7;
+  }
+}
+
+.titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.titlebar-btn {
+  @include flex-center;
+  width: 32px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $ease-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
+  }
+
+  &.logout:hover {
+    color: var(--danger);
+    background: rgba(229, 115, 115, 0.1);
+  }
+}
+
+/* ── Workbench ── */
+.workbench {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Status Bar ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--status-bar-height);
+  padding: 0 8px;
+  background: var(--status-bar-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.status-left,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  height: var(--status-bar-height);
+  white-space: nowrap;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+
+  i {
+    font-size: 0.65rem;
+  }
+
+  &.clickable {
+    cursor: pointer;
+    transition:
+      background $ease-fast,
+      color $ease-fast;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+  }
+
+  &.save-status {
+    background: var(--status-bar-active);
+    color: var(--accent);
+    font-weight: 600;
+  }
+}
+
+/* ── Autosave Indicator ── */
+#autosave-indicator {
+  i {
+    font-size: 5px;
+  }
+  &.saved i {
+    color: var(--success);
+  }
+  &.saving i {
+    color: var(--warning);
+  }
+}

@@ -1,3 +1,13 @@
+---
+title: "developmental"
+author: "Your Name"
+date: "2026-02-28"
+category: "general"
+tags: ["research", "psychology"]
+description: "Brief paper description"
+published: true
+---
+
 # Executive Function Development in Early Childhood
 
 _Principal Investigator • In Development_

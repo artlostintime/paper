@@ -1,0 +1,25 @@
+@use "../abstracts" as *;
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: $space-lg;
+}
+
+.tag {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+  color: var(--accent);
+  transition: all $ease-fast;
+
+  &:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+}

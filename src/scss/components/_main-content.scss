@@ -1,0 +1,16 @@
+@use "../abstracts" as *;
+
+#main-content {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  padding: 100px $space-xl 80px;
+
+  @include respond-to($bp-tablet) {
+    padding: 80px $space-lg 60px;
+  }
+
+  > p {
+    margin-bottom: $space-lg;
+    letter-spacing: 0.005em;
+  }
+}
