@@ -23,6 +23,11 @@ const PAPERS_DIR = path.join(__dirname, "papers");
 const BCRYPT_ROUNDS = 12;
 const VALID_FILENAME = /^[\w-]+\.md$/;
 
+// Production origins (comma-separated in env, e.g. "https://paper.shuvi.tech,https://paper-xxxx.onrender.com")
+const EXTRA_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+  : [];
+
 // ============== AUTHENTICATION CONFIG ==============
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
@@ -301,15 +306,27 @@ app.use(
   }),
 );
 
-// CORS — restricted to localhost
+// CORS — localhost + production origins
+const ALLOWED_ORIGINS = [
+  `http://localhost:${PORT}`,
+  `http://127.0.0.1:${PORT}`,
+  `https://localhost:${HTTPS_PORT}`,
+  `https://127.0.0.1:${HTTPS_PORT}`,
+  ...EXTRA_ORIGINS,
+];
+
 app.use(
   cors({
-    origin: [
-      `http://localhost:${PORT}`,
-      `http://127.0.0.1:${PORT}`,
-      `https://localhost:${HTTPS_PORT}`,
-      `https://127.0.0.1:${HTTPS_PORT}`,
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (same-origin, curl, etc.)
+      if (!origin) return callback(null, true);
+      // Allow if in explicit list
+      if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+      // Allow any HTTPS origin matching common production patterns
+      if (EXTRA_ORIGINS.length === 0 && origin.startsWith("https://"))
+        return callback(null, true);
+      callback(null, false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -340,12 +357,6 @@ function csrfCheck(req, res, next) {
 
   const origin = req.headers["origin"];
   const referer = req.headers["referer"];
-  const allowed = [
-    `http://localhost:${PORT}`,
-    `http://127.0.0.1:${PORT}`,
-    `https://localhost:${HTTPS_PORT}`,
-    `https://127.0.0.1:${HTTPS_PORT}`,
-  ];
 
   // Allow requests with no origin (same-origin form submits, curl, etc.)
   if (!origin && !referer) {
@@ -353,7 +364,17 @@ function csrfCheck(req, res, next) {
   }
 
   const requestOrigin = origin || new URL(referer).origin;
-  if (allowed.some((a) => requestOrigin === a)) {
+
+  // Allow if origin is in the explicit allow list
+  if (ALLOWED_ORIGINS.some((a) => requestOrigin === a)) {
+    return next();
+  }
+
+  // Allow same-origin requests (origin matches the Host header)
+  const proto =
+    req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http");
+  const host = req.headers["x-forwarded-host"] || req.headers["host"];
+  if (host && requestOrigin === `${proto}://${host}`) {
     return next();
   }
 
