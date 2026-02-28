@@ -1,0 +1,91 @@
+@use "variables" as *;
+
+// ── Responsive ──────────────────────────────────
+@mixin respond-to($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@mixin respond-above($bp) {
+  @media (min-width: $bp) {
+    @content;
+  }
+}
+
+// ── Flex ────────────────────────────────────────
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// ── Glass card ──────────────────────────────────
+@mixin glass($radius: $radius-md) {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: $radius;
+}
+
+// ── Solid card ──────────────────────────────────
+@mixin card($radius: $radius-md) {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius;
+}
+
+// ── Text truncation ─────────────────────────────
+@mixin truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Stagger animation delays ────────────────────
+@mixin stagger($count: $stagger-count, $step: $stagger-step, $base: 0s) {
+  @for $i from 1 through $count {
+    &:nth-child(#{$i}) {
+      animation-delay: $base + ($step * $i);
+    }
+  }
+}
+
+// ── Hover lift ──────────────────────────────────
+@mixin hover-lift($y: -4px) {
+  transition:
+    transform $ease-normal,
+    box-shadow $ease-normal,
+    border-color $ease-normal;
+
+  &:hover {
+    transform: translateY($y);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+}
+
+// ── Subtle accent border on hover ───────────────
+@mixin hover-accent {
+  transition: all $ease-fast;
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+// ── Label style ─────────────────────────────────
+@mixin label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

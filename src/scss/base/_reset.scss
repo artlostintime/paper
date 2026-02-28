@@ -1,0 +1,130 @@
+@use "../abstracts" as *;
+
+// ── Dark theme (default) — Refined charcoal ─────
+:root {
+  // Backgrounds
+  --bg-body: #101014;
+  --bg-elevated: #18181c;
+  --bg-card: #1e1e23;
+  --bg-surface: #26262c;
+
+  // Glass
+  --glass-bg: rgba(30, 30, 35, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+
+  // Text – high contrast for readability
+  --text-primary: #f0eeeb;
+  --text-secondary: #a8a4a0;
+  --text-muted: #706c68;
+
+  // Accent — warm amber gold
+  --accent: #d4a853;
+  --accent-hover: #e6be6a;
+  --accent-soft: rgba(212, 168, 83, 0.12);
+  --accent-glow: rgba(212, 168, 83, 0.25);
+
+  // Borders
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 40px rgba(212, 168, 83, 0.08);
+
+  // Panel
+  --panel-bg: #0c0c0f;
+
+  // Typography
+  --font-serif: "Lora", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "Fira Code", "Consolas", monospace;
+
+  // Misc
+  --grain-opacity: 0.025;
+  --reading-width: #{$content-max-width};
+}
+
+// ── Light theme — Warm paper ────────────────────
+[data-theme="light"] {
+  --bg-body: #f7f5f2;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-surface: #f0ede8;
+
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.06);
+
+  --text-primary: #1a1816;
+  --text-secondary: #5c5650;
+  --text-muted: #9a9490;
+
+  --accent: #b8892e;
+  --accent-hover: #9a7025;
+  --accent-soft: rgba(184, 137, 46, 0.1);
+  --accent-glow: rgba(184, 137, 46, 0.15);
+
+  --border: rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.12);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 40px rgba(184, 137, 46, 0.06);
+
+  --panel-bg: #1a1816;
+  --grain-opacity: 0.015;
+}
+
+// ── Reset ───────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+// ── Skip link ───────────────────────────────────
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: $space-md;
+  padding: $space-sm $space-lg;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  border-radius: 0 0 $radius-sm $radius-sm;
+  z-index: $z-skip-link;
+  transition: top $ease-fast;
+  text-decoration: none;
+
+  &:focus {
+    top: 0;
+  }
+}
+
+// ── Focus styles ────────────────────────────────
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+// ── Reduced motion ──────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

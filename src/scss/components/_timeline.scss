@@ -1,0 +1,173 @@
+@use "../abstracts" as *;
+
+/* ── Timeline Section ── */
+.timeline-wrapper {
+  position: relative;
+
+  /* Edge fade shadows */
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity $ease-normal;
+  }
+
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg) 0%, transparent 100%);
+  }
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg) 0%, transparent 100%);
+  }
+
+  /* Hide shadow when fully scrolled to that edge */
+  &.at-start::before {
+    opacity: 0;
+  }
+
+  &.at-end::after {
+    opacity: 0;
+  }
+}
+
+.timeline-container {
+  position: relative;
+  overflow-x: auto;
+  padding: $space-lg 0;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
+/* ── Timeline Entrance Animation ── */
+@keyframes timeline-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Timeline List ── */
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  gap: 0;
+  min-width: max-content;
+  padding-left: $space-xl;
+
+  /* Horizontal line through items */
+  &::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: $space-xl;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--accent),
+      var(--border-strong) 20%,
+      var(--border-strong) 80%,
+      transparent
+    );
+  }
+
+  li {
+    position: relative;
+    flex: 0 0 280px;
+    padding: 0 $space-lg;
+    padding-top: 40px;
+
+    /* Entrance animation */
+    opacity: 0;
+    animation: timeline-fade-up $ease-normal forwards;
+    @include stagger(8, 0.1s, 0s);
+
+    /* Dot marker */
+    &::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: calc(#{$space-lg} + 4px);
+      width: 12px;
+      height: 12px;
+      border-radius: $radius-full;
+      background: var(--bg-elevated);
+      border: 2px solid var(--accent);
+      z-index: 1;
+      transition: all $ease-fast;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    &:hover::before {
+      background: var(--accent);
+      box-shadow:
+        0 0 0 6px var(--accent-glow),
+        var(--shadow-glow);
+      transform: scale(1.2);
+    }
+
+    /* Subtle hover lift on the whole item */
+    transition: transform $ease-fast;
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 240px;
+    }
+  }
+}
+
+/* ── Year Badge ── */
+.year {
+  @include glass($radius-full);
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  padding: 3px 14px;
+  margin-bottom: $space-xs;
+  white-space: nowrap;
+}
+
+/* ── Timeline Hint ── */
+.timeline-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-top: $space-md;
+  opacity: 0.7;
+
+  i {
+    margin-right: 4px;
+  }
+}

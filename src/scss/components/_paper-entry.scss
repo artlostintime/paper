@@ -1,0 +1,124 @@
+@use "../abstracts" as *;
+
+.paper-entry {
+  @include card($radius-lg);
+  padding: $space-xl $space-xl $space-lg;
+  margin-bottom: $space-lg;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform $ease-normal,
+    box-shadow $ease-normal,
+    border-color $ease-normal;
+
+  // Left accent stripe
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity $ease-normal;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: var(--accent-soft);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: $space-sm;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  > p:first-of-type {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: $space-md;
+  }
+
+  // Entrance animation
+  animation: slideInCard 0.5s $ease-normal both;
+  @include stagger;
+}
+
+.paper-title-link {
+  color: var(--text-primary);
+  transition: color $ease-fast;
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
+.paper-content {
+  position: relative;
+  max-height: 110px;
+  overflow: hidden;
+  margin-bottom: $space-md;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(transparent, var(--bg-card));
+    pointer-events: none;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: $space-sm;
+    line-height: 1.7;
+  }
+}
+
+.read-more {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    gap $ease-fast,
+    color $ease-fast;
+
+  &:hover {
+    color: var(--accent-hover);
+    gap: 10px;
+  }
+
+  &::after {
+    content: "→";
+    transition: transform $ease-fast;
+  }
+}
+
+@keyframes slideInCard {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

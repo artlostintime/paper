@@ -1,0 +1,7 @@
+// ─── Psychology Research Portfolio — Admin Stylesheet ───
+
+// Shared reset/theme (provides CSS custom properties)
+@use "base";
+
+// Admin-specific partials
+@use "admin/index";

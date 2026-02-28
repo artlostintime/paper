@@ -1,0 +1,72 @@
+@use "../abstracts" as *;
+
+// ── Subtle noise grain ──────────────────────────
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: $z-grain;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+// ── Body ────────────────────────────────────────
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem; // 17px — optimal readability
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color $ease-normal,
+    color $ease-normal;
+  overflow-x: hidden;
+}
+
+// ── Typography ──────────────────────────────────
+p,
+li,
+span {
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color $ease-fast;
+
+  &:hover {
+    color: var(--accent-hover);
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+// ── Smooth scrollbar ────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: $radius-full;
+
+  &:hover {
+    background: var(--text-muted);
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}

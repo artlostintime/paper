@@ -1,0 +1,64 @@
+@use "../abstracts" as *;
+
+/* ── Paper Category Badge ── */
+.paper-category {
+  @include label;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Recent Badge ── */
+.recent-badge {
+  @include label;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  background: rgba(76, 175, 80, 0.12);
+  color: #81c784;
+}
+
+/* ── Paper Count ── */
+.paper-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ── Reading Time ── */
+.reading-time {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Status Badges ── */
+.badge {
+  @include label;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+
+  &--info {
+    background: rgba(66, 133, 244, 0.12);
+    color: #64b5f6;
+  }
+  &--success {
+    background: rgba(76, 175, 80, 0.12);
+    color: #81c784;
+  }
+  &--warning {
+    background: rgba(255, 183, 77, 0.12);
+    color: #ffb74d;
+  }
+  &--danger {
+    background: rgba(229, 115, 115, 0.12);
+    color: #e57373;
+  }
+}

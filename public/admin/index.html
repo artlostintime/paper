@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
@@ -25,882 +25,18 @@
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
     />
 
-    <!-- All styles are inline below - external style.css removed to prevent conflicts -->
-    <style>
-      :root {
-        --bg-body: #1c1b1a;
-        --bg-card: #252422;
-        --bg-input: #1a1918;
-        --text-main: #e8e4df;
-        --text-muted: #9a9590;
-        --text-light: #b8b2aa;
-        --accent: #c9785d;
-        --accent-hover: #e08b6d;
-        --line: #3a3836;
-        --line-light: #2d2b29;
-        --success: #7fa86f;
-        --danger: #c75d5d;
-        --warning: #d4a855;
-        --info: #5d9dc9;
-      }
-
-      [data-theme="light"] {
-        --bg-body: #f5f5f5;
-        --bg-card: #ffffff;
-        --bg-input: #fafafa;
-        --text-main: #1a1a1a;
-        --text-muted: #6b6b6b;
-        --text-light: #4a4a4a;
-        --accent: #c9785d;
-        --accent-hover: #e08b6d;
-        --line: #e0e0e0;
-        --line-light: #ebebeb;
-        --success: #5a8a4d;
-        --danger: #c75d5d;
-        --warning: #d4a855;
-        --info: #5d9dc9;
-      }
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      html,
-      body {
-        height: 100%;
-        overflow: hidden;
-      }
-      body {
-        background: var(--bg-body);
-        color: var(--text-main);
-        font-family: "Inter", sans-serif;
-        line-height: 1.6;
-      }
-
-      /* Login */
-      .login-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: var(--bg-body);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-      }
-      .login-screen.hidden {
-        display: none;
-      }
-      .login-card {
-        background: var(--bg-card);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 2.5rem;
-        width: 100%;
-        max-width: 380px;
-      }
-      .login-header {
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-      .login-header i {
-        font-size: 3rem;
-        color: var(--accent);
-        margin-bottom: 1rem;
-        display: block;
-      }
-      .login-header h2 {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-      }
-      .login-header p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-      }
-      .login-input-group {
-        position: relative;
-        margin-bottom: 1rem;
-      }
-      .login-input-group > i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-      }
-      .login-input-group input {
-        width: 100%;
-        background: var(--bg-input);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 14px 45px 14px 42px;
-        color: var(--text-main);
-        font-size: 1rem;
-      }
-      .login-input-group input:focus {
-        outline: none;
-        border-color: var(--accent);
-      }
-      .toggle-password {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        padding: 5px 8px;
-      }
-      .login-error {
-        color: var(--danger);
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
-        min-height: 1.2em;
-        text-align: center;
-      }
-      .login-btn {
-        width: 100%;
-        padding: 14px;
-        background: var(--accent);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-      .login-btn:hover {
-        background: var(--accent-hover);
-      }
-      .login-footer {
-        text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--line);
-      }
-      .login-footer a {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-size: 0.85rem;
-      }
-      .login-footer a:hover {
-        color: var(--accent);
-      }
-
-      /* Buttons */
-      .btn {
-        font-family: inherit;
-        font-size: 0.9rem;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-        border: 1px solid transparent;
-        text-decoration: none;
-      }
-      .btn-primary {
-        background: var(--accent);
-        color: white;
-        border-color: var(--accent);
-      }
-      .btn-primary:hover {
-        background: var(--accent-hover);
-        border-color: var(--accent-hover);
-      }
-      .btn-secondary {
-        background: var(--bg-card);
-        color: var(--text-main);
-        border-color: var(--line);
-      }
-      .btn-secondary:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-      .btn-danger {
-        background: transparent;
-        color: var(--danger);
-        border-color: var(--danger);
-      }
-      .btn-danger:hover {
-        background: var(--danger);
-        color: white;
-      }
-      .btn-icon {
-        padding: 8px;
-        border-radius: 6px;
-        background: transparent;
-        border: 1px solid var(--line);
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .btn-icon:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-
-      /* Admin Layout */
-      .admin-app {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .admin-header {
-        background: var(--bg-card);
-        border-bottom: 1px solid var(--line);
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-      .admin-header h1 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .admin-header h1 i {
-        color: var(--accent);
-      }
-      .header-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      .header-search {
-        position: relative;
-      }
-      .header-search input {
-        background: var(--bg-input);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 8px 16px 8px 36px;
-        color: var(--text-main);
-        font-size: 0.85rem;
-        width: 200px;
-      }
-      .header-search input:focus {
-        outline: none;
-        border-color: var(--accent);
-      }
-      .header-search i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 0.85rem;
-      }
-
-      .admin-container {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
-      }
-      .admin-container.sidebar-collapsed {
-        grid-template-columns: 0 1fr;
-      }
-
-      /* Sidebar */
-      .sidebar {
-        background: var(--bg-card);
-        border-right: 1px solid var(--line);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .sidebar-header {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--line);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .sidebar-header h2 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-      .paper-count {
-        font-size: 0.75rem;
-        background: var(--line);
-        padding: 2px 8px;
-        border-radius: 10px;
-        color: var(--text-muted);
-      }
-      .paper-list {
-        list-style: none;
-        flex: 1;
-        overflow-y: auto;
-      }
-      .paper-item {
-        padding: 0.875rem 1rem;
-        border-bottom: 1px solid var(--line-light);
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .paper-item:hover {
-        background: var(--line-light);
-      }
-      .paper-item.active {
-        background: rgba(201, 120, 93, 0.1);
-        border-left: 3px solid var(--accent);
-      }
-      .paper-item-info {
-        flex: 1;
-        min-width: 0;
-      }
-      .paper-item-info h3 {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 2px;
-        color: var(--text-main);
-        text-transform: capitalize;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .paper-item-info p {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .paper-item-actions {
-        display: flex;
-        gap: 4px;
-        opacity: 0;
-      }
-      .paper-item:hover .paper-item-actions {
-        opacity: 1;
-      }
-      .icon-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        padding: 4px 6px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-      }
-      .icon-btn:hover {
-        background: var(--line);
-        color: var(--text-main);
-      }
-      .sidebar-footer {
-        padding: 0.75rem 1rem;
-        background: var(--bg-card);
-      }
-
-      /* Custom scrollbar styling */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: var(--bg-body);
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--line);
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--text-muted);
-      }
-      * {
-        scrollbar-width: thin;
-        scrollbar-color: var(--line) var(--bg-body);
-      }
-      .sidebar-toggle {
-        position: fixed;
-        left: 280px;
-        top: 70px;
-        width: 20px;
-        height: 40px;
-        background: var(--bg-card);
-        border: 1px solid var(--line);
-        border-left: none;
-        border-radius: 0 6px 6px 0;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-muted);
-        font-size: 0.65rem;
-        z-index: 200;
-        opacity: 0.5;
-      }
-      .sidebar-toggle:hover {
-        background: var(--accent);
-        color: white;
-        opacity: 1;
-      }
-      .sidebar-collapsed .sidebar-toggle {
-        left: 0;
-      }
-
-      /* Editor Area */
-      .editor-area {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        flex: 1;
-        min-height: 0;
-      }
-      .editor-toolbar {
-        padding: 0.75rem 1rem;
-        background: var(--bg-card);
-        border-bottom: 1px solid var(--line);
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        flex-wrap: wrap;
-        flex-shrink: 0;
-      }
-      .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-      .input-group label {
-        font-size: 0.65rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-      }
-      .input-group input {
-        background: var(--bg-input);
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        padding: 6px 10px;
-        color: var(--text-main);
-        font-family: "Fira Code", monospace;
-        font-size: 0.85rem;
-        width: 220px;
-      }
-      .input-group input:focus {
-        outline: none;
-        border-color: var(--accent);
-      }
-      .toolbar-divider {
-        width: 1px;
-        height: 30px;
-        background: var(--line);
-        margin: 0 4px;
-      }
-      .toolbar-right {
-        margin-left: auto;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      /* Dropdowns */
-      .dropdown {
-        position: relative;
-      }
-      .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background: var(--bg-card);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        min-width: 180px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.2s;
-        z-index: 100;
-      }
-      .dropdown-menu.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(5px);
-      }
-      .dropdown-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        padding: 10px 14px;
-        text-align: left;
-        background: none;
-        border: none;
-        color: var(--text-main);
-        font-size: 0.85rem;
-        cursor: pointer;
-      }
-      .dropdown-option:hover {
-        background: var(--line-light);
-        color: var(--accent);
-      }
-      .dropdown-divider {
-        height: 1px;
-        background: var(--line);
-        margin: 4px 0;
-      }
-
-      /* Word count & View toggle */
-      .word-count {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        padding: 4px 10px;
-        background: var(--bg-input);
-        border-radius: 4px;
-        display: flex;
-        gap: 12px;
-      }
-      .word-count span {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .view-toggle {
-        display: flex;
-        background: var(--bg-input);
-        border-radius: 6px;
-        padding: 2px;
-      }
-      .view-toggle button {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        padding: 4px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.8rem;
-      }
-      .view-toggle button:hover {
-        color: var(--text-main);
-      }
-      .view-toggle button.active {
-        background: var(--accent);
-        color: white;
-      }
-      .autosave-indicator {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .unsaved-dot {
-        width: 8px;
-        height: 8px;
-        background: var(--warning);
-        border-radius: 50%;
-        display: none;
-      }
-      .unsaved-dot.show {
-        display: inline-block;
-      }
-
-      /* Quick Insert */
-      .quick-insert {
-        display: flex;
-        gap: 4px;
-        padding: 0.5rem 1rem;
-        background: var(--bg-card);
-        border-bottom: 1px solid var(--line);
-        overflow-x: auto;
-        flex-shrink: 0;
-      }
-      .quick-insert button {
-        background: var(--bg-input);
-        border: 1px solid var(--line);
-        color: var(--text-muted);
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        white-space: nowrap;
-        font-family: "Fira Code", monospace;
-      }
-      .quick-insert button:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-
-      /* Editor Content - THE KEY PART */
-      .editor-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        flex: 1;
-        overflow: hidden;
-        min-height: 0;
-      }
-      .editor-content.preview-only {
-        grid-template-columns: 0 1fr;
-      }
-      .editor-content.editor-only {
-        grid-template-columns: 1fr 0;
-      }
-      .editor-pane,
-      .preview-pane {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .editor-pane {
-        border-right: 1px solid var(--line);
-      }
-      .pane-header {
-        padding: 0.5rem 1rem;
-        background: var(--bg-card);
-        border-bottom: 1px solid var(--line);
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-      }
-      .pane-header i {
-        color: var(--accent);
-      }
-      textarea#markdown-editor {
-        flex: 1;
-        background: var(--bg-body);
-        border: none;
-        padding: 1.25rem;
-        color: var(--text-main);
-        font-family: "Fira Code", monospace;
-        font-size: 0.875rem;
-        line-height: 1.7;
-        resize: none;
-        outline: none;
-      }
-      textarea#markdown-editor::placeholder {
-        color: var(--text-muted);
-      }
-      .preview-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1.25rem;
-        background: var(--bg-body);
-      }
-
-      /* Preview styling */
-      .preview-content h1 {
-        font-family: "Lora", serif;
-        font-size: 1.6rem;
-        margin-bottom: 0.5rem;
-      }
-      .preview-content h2 {
-        font-family: "Lora", serif;
-        font-size: 1.2rem;
-        margin: 1.25rem 0 0.6rem;
-      }
-      .preview-content p {
-        margin-bottom: 0.875rem;
-        color: var(--text-light);
-      }
-      .preview-content ul,
-      .preview-content ol {
-        margin: 0.875rem 0 0.875rem 1.5rem;
-        color: var(--text-light);
-      }
-      .preview-content blockquote {
-        border-left: 3px solid var(--accent);
-        margin: 1rem 0;
-        padding: 0.5rem 1rem;
-        background: var(--bg-card);
-      }
-      .preview-content code {
-        background: var(--bg-card);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-family: "Fira Code", monospace;
-      }
-
-      /* Empty state */
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: var(--text-muted);
-        text-align: center;
-        padding: 2rem;
-      }
-      .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.3;
-      }
-      .empty-state h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-        color: var(--text-light);
-      }
-      .shortcuts-hint {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin-top: 1rem;
-      }
-      .shortcuts-hint kbd {
-        background: var(--line);
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-
-      /* Toast */
-      .toast {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transform: translateY(100px);
-        opacity: 0;
-        transition: all 0.3s;
-        z-index: 1000;
-      }
-      .toast.show {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      .toast.success {
-        background: var(--success);
-        color: white;
-      }
-      .toast.error {
-        background: var(--danger);
-        color: white;
-      }
-      .toast.info {
-        background: var(--info);
-        color: white;
-      }
-
-      /* Modal */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-      }
-      .modal-overlay.show {
-        opacity: 1;
-        visibility: visible;
-      }
-      .modal {
-        background: var(--bg-card);
-        border-radius: 12px;
-        padding: 1.5rem;
-        max-width: 400px;
-        width: 90%;
-        text-align: center;
-      }
-      .modal h3 {
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-      .modal p {
-        color: var(--text-muted);
-        margin-bottom: 1.25rem;
-        font-size: 0.9rem;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-      }
-
-      /* Distraction-Free Mode */
-      .admin-container.distraction-free .sidebar,
-      .distraction-free .admin-header,
-      .distraction-free .editor-toolbar,
-      .distraction-free .quick-insert {
-        display: none !important;
-      }
-      .admin-container.distraction-free {
-        grid-template-columns: 1fr;
-        height: 100vh;
-      }
-      .admin-container.distraction-free .editor-area {
-        height: 100vh;
-      }
-      .admin-container.distraction-free .editor-content {
-        height: 100%;
-      }
-      .admin-container.distraction-free textarea#markdown-editor {
-        padding: 3rem;
-        font-size: 1rem;
-      }
-      .admin-container.distraction-free .preview-content {
-        padding: 3rem;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-
-      /* Syntax Highlighting for Editor */
-      .editor-textarea {
-        font-family: "Fira Code", "Courier New", monospace !important;
-      }
-
-      /* Responsive */
-      @media (max-width: 900px) {
-        .admin-container {
-          grid-template-columns: 1fr;
-        }
-        .sidebar {
-          display: none;
-        }
-        .sidebar-toggle {
-          display: none;
-        }
-        .editor-content {
-          grid-template-columns: 1fr;
-        }
-        .preview-pane {
-          display: none;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"
+    />
+    <!-- Prevent theme flash -->
+    <script>
+      (function () {
+        var t = localStorage.getItem("admin-theme") || "dark";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
   </head>
   <body>
     <!-- Login Screen -->
@@ -946,257 +82,366 @@
 
     <!-- Admin App (hidden until authenticated) -->
     <div class="admin-app" id="admin-app" style="display: none">
-      <header class="admin-header">
-        <h1><i class="fas fa-cog"></i> Admin Panel</h1>
-        <div class="header-actions">
-          <div class="header-search">
+      <!-- ── Title Bar ── -->
+      <header class="titlebar">
+        <div class="titlebar-left">
+          <i class="fas fa-cog titlebar-icon"></i>
+          <span class="titlebar-title">Admin Panel</span>
+        </div>
+        <div class="titlebar-center">
+          <button
+            class="command-trigger"
+            id="command-palette-btn"
+            title="Command Palette (Ctrl+P)"
+          >
             <i class="fas fa-search"></i>
-            <input
-              type="text"
-              id="search-papers"
-              placeholder="Search papers..."
-            />
-          </div>
-          <button
-            class="btn-icon"
-            id="font-decrease"
-            title="Decrease Font Size (Ctrl+-)"
-          >
-            <i class="fas fa-minus"></i>
+            <span>Search papers…</span>
+            <kbd>Ctrl+P</kbd>
           </button>
+        </div>
+        <div class="titlebar-right">
           <button
-            class="btn-icon"
-            id="font-increase"
-            title="Increase Font Size (Ctrl++)"
-          >
-            <i class="fas fa-plus"></i>
-          </button>
-          <button
-            class="btn-icon"
+            class="titlebar-btn"
             id="theme-toggle"
             title="Toggle Theme (Ctrl+Shift+T)"
           >
             <i class="fas fa-moon"></i>
           </button>
           <button
-            class="btn-icon"
-            id="distraction-free"
-            title="Distraction Free (F11)"
-          >
-            <i class="fas fa-expand"></i>
-          </button>
-          <button
-            class="btn-icon"
+            class="titlebar-btn"
             id="shortcuts-btn"
             title="Keyboard Shortcuts"
           >
             <i class="fas fa-keyboard"></i>
           </button>
-          <button class="btn-icon logout-btn" id="logout-btn" title="Logout">
+          <a
+            href="../index.html"
+            class="titlebar-btn"
+            target="_blank"
+            title="View Site"
+          >
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+          <button class="titlebar-btn logout" id="logout-btn" title="Logout">
             <i class="fas fa-sign-out-alt"></i>
           </button>
-          <a href="../index.html" class="btn btn-secondary" target="_blank">
-            <i class="fas fa-external-link-alt"></i> View Site
-          </a>
         </div>
       </header>
 
-      <div class="admin-container">
-        <!-- Floating toggle button -->
-        <button
-          class="sidebar-toggle"
-          id="sidebar-toggle"
-          title="Toggle Sidebar (Ctrl+B)"
-        >
-          <i class="fas fa-chevron-left"></i>
-        </button>
-
-        <aside class="sidebar" id="sidebar">
-          <div class="sidebar-header">
-            <h2>Papers</h2>
-            <span class="paper-count" id="paper-count">0</span>
-          </div>
-          <ul class="paper-list" id="paper-list"></ul>
-          <div class="sidebar-footer">
+      <div class="workbench">
+        <!-- ── Activity Bar ── -->
+        <aside class="activity-bar">
+          <div class="activity-top">
             <button
-              class="btn btn-primary"
-              id="new-btn-sidebar"
-              style="width: 100%"
+              class="activity-btn active"
+              data-panel="explorer"
+              title="Explorer (Ctrl+Shift+E)"
             >
-              <i class="fas fa-plus"></i><span> New Paper</span>
+              <i class="fas fa-copy"></i>
+            </button>
+            <button
+              class="activity-btn"
+              data-panel="templates"
+              title="Templates"
+            >
+              <i class="fas fa-file-alt"></i>
+            </button>
+          </div>
+          <div class="activity-bottom">
+            <button class="activity-btn" id="distraction-free" title="Zen Mode">
+              <i class="fas fa-expand"></i>
             </button>
           </div>
         </aside>
 
-        <main class="editor-area">
-          <div class="editor-toolbar">
-            <div class="input-group">
-              <label for="filename">Filename</label>
-              <input type="text" id="filename" placeholder="my-paper.md" />
-            </div>
-
-            <div class="toolbar-divider"></div>
-
-            <div class="dropdown">
-              <button class="btn btn-secondary" id="template-btn">
-                <i class="fas fa-file-alt"></i> Templates
-              </button>
-              <div class="dropdown-menu" id="template-menu">
-                <button class="dropdown-option" data-template="basic">
-                  <i class="fas fa-file"></i> Basic Paper
-                </button>
-                <button class="dropdown-option" data-template="research">
-                  <i class="fas fa-flask"></i> Research Article
-                </button>
-                <button class="dropdown-option" data-template="literature">
-                  <i class="fas fa-book"></i> Literature Review
-                </button>
-                <button class="dropdown-option" data-template="notes">
-                  <i class="fas fa-sticky-note"></i> Quick Notes
-                </button>
-                <button class="dropdown-option" data-template="clinical">
-                  <i class="fas fa-user-md"></i> Clinical Case Study
-                </button>
-                <button class="dropdown-option" data-template="experiment">
-                  <i class="fas fa-vial"></i> Experiment Report
-                </button>
-                <button class="dropdown-option" data-template="summary">
-                  <i class="fas fa-list"></i> Paper Summary
-                </button>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-option" data-template="empty">
-                  <i class="fas fa-file-medical"></i> Empty Document
-                </button>
-              </div>
-            </div>
-
-            <div class="dropdown">
-              <button class="btn btn-secondary" id="export-btn">
-                <i class="fas fa-download"></i> Export
-              </button>
-              <div class="dropdown-menu" id="export-menu">
-                <button class="dropdown-option" data-export="markdown">
-                  <i class="fas fa-file-code"></i> Markdown (.md)
-                </button>
-                <button class="dropdown-option" data-export="html">
-                  <i class="fas fa-file-code"></i> HTML
-                </button>
-                <button class="dropdown-option" data-export="text">
-                  <i class="fas fa-file-alt"></i> Plain Text
-                </button>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-option" data-export="pdf">
-                  <i class="fas fa-file-pdf"></i> PDF (Print)
-                </button>
-              </div>
-            </div>
-
-            <div class="dropdown">
-              <button class="btn btn-secondary" id="insert-btn">
-                <i class="fas fa-plus-circle"></i> Insert
-              </button>
-              <div class="dropdown-menu" id="insert-menu">
-                <button class="dropdown-option" data-insert="heading">
-                  <i class="fas fa-heading"></i> Heading
-                </button>
-                <button class="dropdown-option" data-insert="link">
-                  <i class="fas fa-link"></i> Link
-                </button>
-                <button class="dropdown-option" data-insert="image">
-                  <i class="fas fa-image"></i> Image
-                </button>
-                <button class="dropdown-option" data-insert="list">
-                  <i class="fas fa-list"></i> Bullet List
-                </button>
-                <button class="dropdown-option" data-insert="quote">
-                  <i class="fas fa-quote-left"></i> Blockquote
-                </button>
-                <button class="dropdown-option" data-insert="math">
-                  <i class="fas fa-square-root-alt"></i> Math Equation
-                </button>
-                <button class="dropdown-option" data-insert="table">
-                  <i class="fas fa-table"></i> Table
-                </button>
-              </div>
-            </div>
-
-            <button
-              class="btn btn-secondary"
-              id="yaml-btn"
-              title="Insert YAML Frontmatter"
-            >
-              <i class="fas fa-code"></i> YAML
-            </button>
-
-            <div class="toolbar-right">
-              <div class="word-count" id="word-count">
-                <span
-                  ><i class="fas fa-font"></i>
-                  <span id="wc-words">0</span> words</span
+        <!-- ── Side Panel ── -->
+        <aside class="side-panel" id="side-panel">
+          <!-- Explorer -->
+          <div class="panel-view active" id="panel-explorer">
+            <div class="panel-header">
+              <span class="panel-title">EXPLORER</span>
+              <div class="panel-actions">
+                <button
+                  class="panel-btn"
+                  id="new-btn-sidebar"
+                  title="New Paper (Ctrl+N)"
                 >
-                <span
-                  ><i class="fas fa-paragraph"></i>
-                  <span id="wc-chars">0</span> chars</span
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button class="panel-btn" id="refresh-btn" title="Refresh">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+                <button
+                  class="panel-btn"
+                  id="collapse-panel-btn"
+                  title="Collapse (Ctrl+B)"
                 >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
               </div>
+            </div>
+            <div class="panel-section">
+              <button class="section-toggle" data-section="papers">
+                <i class="fas fa-chevron-down section-chevron"></i>
+                <span>PAPERS</span>
+                <span class="badge" id="paper-count">0</span>
+              </button>
+              <ul class="file-tree" id="paper-list"></ul>
+            </div>
+          </div>
 
-              <div class="toolbar-divider"></div>
+          <!-- Templates -->
+          <div class="panel-view" id="panel-templates">
+            <div class="panel-header">
+              <span class="panel-title">TEMPLATES</span>
+            </div>
+            <ul class="file-tree template-list">
+              <li class="tree-item" data-template="basic">
+                <i class="fas fa-file"></i> Basic Paper
+              </li>
+              <li class="tree-item" data-template="research">
+                <i class="fas fa-flask"></i> Research Article
+              </li>
+              <li class="tree-item" data-template="literature">
+                <i class="fas fa-book"></i> Literature Review
+              </li>
+              <li class="tree-item" data-template="notes">
+                <i class="fas fa-sticky-note"></i> Quick Notes
+              </li>
+              <li class="tree-item" data-template="clinical">
+                <i class="fas fa-user-md"></i> Clinical Case Study
+              </li>
+              <li class="tree-item" data-template="experiment">
+                <i class="fas fa-vial"></i> Experiment Report
+              </li>
+              <li class="tree-item" data-template="summary">
+                <i class="fas fa-list"></i> Paper Summary
+              </li>
+              <li class="tree-item" data-template="empty">
+                <i class="fas fa-file-medical"></i> Empty Document
+              </li>
+            </ul>
+          </div>
+        </aside>
 
+        <!-- ── Panel Resize Handle ── -->
+        <div class="sash vertical" id="panel-sash"></div>
+
+        <!-- ── Editor Group ── -->
+        <main class="editor-group">
+          <!-- Tab Bar -->
+          <div class="tab-bar">
+            <div class="tabs-scroll">
+              <div class="editor-tab active" id="active-tab">
+                <i class="fas fa-file-code tab-icon"></i>
+                <span class="tab-name" id="tab-filename">Untitled</span>
+                <span class="tab-dot" id="tab-unsaved"></span>
+              </div>
+            </div>
+            <div class="tab-actions">
               <div class="view-toggle">
                 <button data-view="split" class="active" title="Split View">
                   <i class="fas fa-columns"></i>
                 </button>
                 <button data-view="editor" title="Editor Only">
-                  <i class="fas fa-edit"></i>
+                  <i class="fas fa-code"></i>
                 </button>
                 <button data-view="preview" title="Preview Only">
                   <i class="fas fa-eye"></i>
                 </button>
               </div>
-
-              <div class="toolbar-divider"></div>
-
-              <div class="autosave-indicator" id="autosave-indicator">
-                <i class="fas fa-circle"></i>
-                <span>Ready</span>
+              <div class="dropdown">
+                <button class="tab-action-btn" id="export-btn" title="Export">
+                  <i class="fas fa-download"></i>
+                </button>
+                <div class="dropdown-menu" id="export-menu">
+                  <button class="dropdown-option" data-export="markdown">
+                    <i class="fas fa-file-code"></i> Markdown (.md)
+                  </button>
+                  <button class="dropdown-option" data-export="html">
+                    <i class="fas fa-file-code"></i> HTML
+                  </button>
+                  <button class="dropdown-option" data-export="text">
+                    <i class="fas fa-file-alt"></i> Plain Text
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-option" data-export="pdf">
+                    <i class="fas fa-file-pdf"></i> PDF (Print)
+                  </button>
+                </div>
               </div>
-
-              <span
-                class="unsaved-dot"
-                id="unsaved-dot"
-                title="Unsaved changes"
-              ></span>
-
-              <button class="btn btn-primary" id="save-btn">
-                <i class="fas fa-save"></i> Save
-              </button>
             </div>
           </div>
 
-          <div class="quick-insert">
-            <button data-quick="**bold**" title="Bold">**B**</button>
-            <button data-quick="*italic*" title="Italic">*I*</button>
-            <button data-quick="# " title="Heading"># H1</button>
-            <button data-quick="## " title="Heading 2">## H2</button>
-            <button data-quick="### " title="Heading 3">### H3</button>
-            <button data-quick="- " title="List item">• List</button>
-            <button data-quick="1. " title="Numbered item">1. Num</button>
-            <button data-quick="[text](url)" title="Link">🔗 Link</button>
-            <button data-quick="$equation$" title="Inline Math">∑ Math</button>
-            <button data-quick="> " title="Quote">❝ Quote</button>
-            <button data-quick="---" title="Horizontal Rule">— HR</button>
-          </div>
-
-          <div class="editor-content" id="editor-content">
-            <div class="editor-pane">
-              <div class="pane-header">
-                <div class="pane-header-left">
-                  <i class="fas fa-code"></i> Markdown
+          <!-- Breadcrumb Bar -->
+          <div class="breadcrumb-bar">
+            <span class="crumb"><i class="fas fa-folder-open"></i> papers</span>
+            <i class="fas fa-chevron-right crumb-sep"></i>
+            <input
+              type="text"
+              id="filename"
+              class="crumb-input"
+              placeholder="my-paper.md"
+            />
+            <div class="breadcrumb-actions">
+              <button class="crumb-btn" id="yaml-btn" title="Insert YAML">
+                <i class="fas fa-code"></i> YAML
+              </button>
+              <div class="dropdown">
+                <button
+                  class="crumb-btn"
+                  id="insert-btn"
+                  title="Insert Snippet"
+                >
+                  <i class="fas fa-plus-circle"></i> Insert
+                </button>
+                <div class="dropdown-menu" id="insert-menu">
+                  <button class="dropdown-option" data-insert="heading">
+                    <i class="fas fa-heading"></i> Heading
+                  </button>
+                  <button class="dropdown-option" data-insert="link">
+                    <i class="fas fa-link"></i> Link
+                  </button>
+                  <button class="dropdown-option" data-insert="image">
+                    <i class="fas fa-image"></i> Image
+                  </button>
+                  <button class="dropdown-option" data-insert="list">
+                    <i class="fas fa-list"></i> Bullet List
+                  </button>
+                  <button class="dropdown-option" data-insert="quote">
+                    <i class="fas fa-quote-left"></i> Blockquote
+                  </button>
+                  <button class="dropdown-option" data-insert="math">
+                    <i class="fas fa-square-root-alt"></i> Math Equation
+                  </button>
+                  <button class="dropdown-option" data-insert="table">
+                    <i class="fas fa-table"></i> Table
+                  </button>
                 </div>
               </div>
-              <textarea
-                id="markdown-editor"
-                placeholder="Start writing your paper in Markdown...
+            </div>
+          </div>
+
+          <!-- Quick Format Bar -->
+          <div class="quick-format">
+            <button data-quick="**bold**" title="Bold (Ctrl+B)">
+              <strong>B</strong>
+            </button>
+            <button data-quick="*italic*" title="Italic (Ctrl+I)">
+              <em>I</em>
+            </button>
+            <span class="qf-sep"></span>
+            <button data-quick="# " title="H1">H1</button>
+            <button data-quick="## " title="H2">H2</button>
+            <button data-quick="### " title="H3">H3</button>
+            <span class="qf-sep"></span>
+            <button data-quick="- " title="List">
+              <i class="fas fa-list-ul"></i>
+            </button>
+            <button data-quick="1. " title="Num List">
+              <i class="fas fa-list-ol"></i>
+            </button>
+            <button data-quick="[text](url)" title="Link">
+              <i class="fas fa-link"></i>
+            </button>
+            <button data-quick="$equation$" title="Math">∑</button>
+            <button data-quick="> " title="Quote">
+              <i class="fas fa-quote-left"></i>
+            </button>
+            <button data-quick="---" title="HR">—</button>
+          </div>
+
+          <!-- Editor + Preview Split -->
+          <div class="editor-content" id="editor-content">
+            <button
+              class="mobile-preview-toggle"
+              id="mobile-preview-toggle"
+              title="Toggle Preview"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+
+            <div class="editor-pane">
+              <div class="pane-label"><i class="fas fa-code"></i> Markdown</div>
+
+              <!-- Find & Replace Widget -->
+              <div class="find-replace-widget" id="find-replace-widget">
+                <div class="fr-row">
+                  <input
+                    type="text"
+                    id="fr-find-input"
+                    class="fr-input"
+                    placeholder="Find"
+                    spellcheck="false"
+                  />
+                  <button
+                    class="fr-btn"
+                    id="fr-regex-btn"
+                    title="Use Regular Expression"
+                  >
+                    .*
+                  </button>
+                  <button class="fr-btn" id="fr-case-btn" title="Match Case">
+                    Aa
+                  </button>
+                  <span class="fr-count" id="fr-count">0 results</span>
+                  <button
+                    class="fr-btn"
+                    id="fr-prev-btn"
+                    title="Previous (Shift+Enter)"
+                  >
+                    <i class="fas fa-chevron-up"></i>
+                  </button>
+                  <button class="fr-btn" id="fr-next-btn" title="Next (Enter)">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <button
+                    class="fr-btn"
+                    id="fr-expand-btn"
+                    title="Toggle Replace"
+                  >
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <button
+                    class="fr-btn fr-close"
+                    id="fr-close-btn"
+                    title="Close (Esc)"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="fr-row fr-replace-row" id="fr-replace-row">
+                  <input
+                    type="text"
+                    id="fr-replace-input"
+                    class="fr-input"
+                    placeholder="Replace"
+                    spellcheck="false"
+                  />
+                  <button class="fr-btn" id="fr-replace-btn" title="Replace">
+                    <i class="fas fa-exchange-alt"></i>
+                  </button>
+                  <button
+                    class="fr-btn"
+                    id="fr-replace-all-btn"
+                    title="Replace All"
+                  >
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="editor-scroll">
+                <div class="line-numbers" id="line-numbers"></div>
+                <div class="editor-input-wrap">
+                  <pre
+                    class="syntax-highlight"
+                    id="syntax-highlight"
+                    aria-hidden="true"
+                  ><code></code></pre>
+                  <textarea
+                    id="markdown-editor"
+                    placeholder="Start writing your paper in Markdown...
 
 # Paper Title
 
@@ -1204,18 +449,17 @@
 
 ## Abstract
 
-Write your abstract here...
-
-Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
-              ></textarea>
-            </div>
-
-            <div class="preview-pane">
-              <div class="pane-header">
-                <div class="pane-header-left">
-                  <i class="fas fa-eye"></i> Preview
+Write your abstract here…"
+                    spellcheck="false"
+                  ></textarea>
                 </div>
               </div>
+            </div>
+
+            <div class="split-sash" id="editor-sash"></div>
+
+            <div class="preview-pane">
+              <div class="pane-label"><i class="fas fa-eye"></i> Preview</div>
               <div class="preview-content" id="preview-content">
                 <div class="empty-state">
                   <i class="fas fa-file-alt"></i>
@@ -1233,8 +477,91 @@ Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
         </main>
       </div>
 
+      <!-- Zen Mode Toolbar (floats independently — must be outside status-bar) -->
+      <div class="zen-toolbar" id="zen-toolbar">
+        <button data-zen-view="split" class="active" title="Split View">
+          <i class="fas fa-columns"></i>
+        </button>
+        <button data-zen-view="editor" title="Editor Only">
+          <i class="fas fa-code"></i>
+        </button>
+        <button data-zen-view="preview" title="Preview Only">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button id="zen-exit" title="Exit Zen Mode (Esc)">
+          <i class="fas fa-compress"></i>
+        </button>
+      </div>
+
+      <!-- ── Status Bar ── -->
+      <footer class="status-bar">
+        <div class="status-left">
+          <button
+            class="status-item clickable"
+            id="sidebar-toggle"
+            title="Toggle Sidebar (Ctrl+B)"
+          >
+            <i class="fas fa-columns"></i>
+          </button>
+          <div class="status-item" id="autosave-indicator">
+            <i class="fas fa-circle"></i> <span>Ready</span>
+          </div>
+          <div class="status-item">
+            <i class="fas fa-code-branch"></i> papers
+          </div>
+        </div>
+        <div class="status-right">
+          <div class="status-item" id="cursor-position">Ln 1, Col 1</div>
+          <div class="status-item" id="word-count">
+            <span id="wc-words">0</span> words &nbsp;
+            <span id="wc-chars">0</span> chars
+          </div>
+          <div class="status-item">Markdown</div>
+          <div class="status-item">UTF-8</div>
+          <button
+            class="status-item clickable"
+            id="font-decrease"
+            title="Ctrl+-"
+          >
+            <i class="fas fa-minus"></i>
+          </button>
+          <span class="status-item" id="font-size-label">14px</span>
+          <button
+            class="status-item clickable"
+            id="font-increase"
+            title="Ctrl++"
+          >
+            <i class="fas fa-plus"></i>
+          </button>
+          <button
+            class="status-item save-status clickable"
+            id="save-btn"
+            title="Save (Ctrl+S)"
+          >
+            <i class="fas fa-save"></i> Save
+          </button>
+        </div>
+      </footer>
+
+      <!-- Toast -->
       <div class="toast" id="toast"></div>
 
+      <!-- Command Palette -->
+      <div class="command-palette-overlay" id="command-palette">
+        <div class="command-palette">
+          <div class="command-input-wrap">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="command-palette-input"
+              placeholder="Type a paper name or command…"
+            />
+          </div>
+          <ul class="command-results" id="command-list"></ul>
+        </div>
+      </div>
+
+      <!-- Delete Modal -->
       <div class="modal-overlay" id="delete-modal">
         <div class="modal">
           <h3>
@@ -1255,34 +582,42 @@ Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
         </div>
       </div>
 
+      <!-- Shortcuts Modal -->
       <div class="modal-overlay" id="shortcuts-modal">
-        <div class="modal" style="max-width: 500px; text-align: left">
-          <h3 style="justify-content: flex-start">
+        <div class="modal shortcuts-modal">
+          <h3>
             <i class="fas fa-keyboard" style="color: var(--accent)"></i>
             Keyboard Shortcuts
           </h3>
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 8px;
-              margin-top: 1rem;
-            "
-          >
-            <div><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</div>
-            <div><kbd>Ctrl</kbd>+<kbd>N</kbd> New Paper</div>
-            <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Bold</div>
-            <div><kbd>Ctrl</kbd>+<kbd>I</kbd> Italic</div>
-            <div><kbd>Ctrl</kbd>+<kbd>K</kbd> Insert Link</div>
-            <div><kbd>Ctrl</kbd>+<kbd>F</kbd> Find</div>
-            <div><kbd>Ctrl</kbd>+<kbd>+</kbd> Bigger Font</div>
-            <div><kbd>Ctrl</kbd>+<kbd>-</kbd> Smaller Font</div>
-            <div><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> Theme</div>
-            <div><kbd>F11</kbd> Distraction Free</div>
-            <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Toggle Sidebar</div>
-            <div><kbd>Esc</kbd> Close Modals</div>
+          <div class="shortcuts-grid">
+            <div class="shortcut-group">
+              <h4>General</h4>
+              <div><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</div>
+              <div><kbd>Ctrl</kbd>+<kbd>N</kbd> New Paper</div>
+              <div><kbd>Ctrl</kbd>+<kbd>P</kbd> Command Palette</div>
+              <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Toggle Sidebar</div>
+              <div><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> Theme</div>
+              <div><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> Explorer</div>
+              <div><kbd>F11</kbd> Zen Mode</div>
+              <div><kbd>Ctrl</kbd>+<kbd>/</kbd> This dialog</div>
+            </div>
+            <div class="shortcut-group">
+              <h4>Editing</h4>
+              <div><kbd>Ctrl</kbd>+<kbd>B</kbd> Bold (in editor)</div>
+              <div><kbd>Ctrl</kbd>+<kbd>I</kbd> Italic</div>
+              <div><kbd>Ctrl</kbd>+<kbd>K</kbd> Insert Link</div>
+              <div><kbd>Ctrl</kbd>+<kbd>D</kbd> Duplicate Line</div>
+              <div><kbd>Ctrl</kbd>+<kbd>F</kbd> Find</div>
+              <div><kbd>Ctrl</kbd>+<kbd>H</kbd> Find & Replace</div>
+              <div><kbd>Tab</kbd> Indent</div>
+              <div><kbd>Shift</kbd>+<kbd>Tab</kbd> Dedent</div>
+              <div><kbd>Ctrl</kbd>+<kbd>+</kbd> Bigger Font</div>
+              <div><kbd>Ctrl</kbd>+<kbd>-</kbd> Smaller Font</div>
+              <div><kbd>/</kbd> Slash commands</div>
+              <div><kbd>Esc</kbd> Close Modals</div>
+            </div>
           </div>
-          <div class="modal-actions" style="margin-top: 1.5rem">
+          <div class="modal-actions">
             <button class="btn btn-secondary" id="close-shortcuts">
               Close
             </button>
@@ -1290,69 +625,14 @@ Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
         </div>
       </div>
     </div>
-    <!-- End admin-app -->
 
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- DOMPurify for XSS protection -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-
-    <!-- Inline Backup Login Handler (works even if script.js fails to load) -->
-    <script>
-      (function () {
-        var loginForm = document.getElementById("login-form");
-        if (loginForm && !loginForm._hasHandler) {
-          loginForm._hasHandler = true;
-          loginForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            var pwd = document.getElementById("login-password");
-            var err = document.getElementById("login-error");
-            var btn = loginForm.querySelector("button[type=submit]");
-
-            if (!pwd || !pwd.value) {
-              if (err) err.textContent = "Please enter password";
-              return;
-            }
-
-            if (btn) {
-              btn.disabled = true;
-              btn.innerHTML =
-                '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-            }
-
-            try {
-              var res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "same-origin",
-                body: JSON.stringify({ password: pwd.value }),
-              });
-              var data = await res.json();
-
-              if (data.success) {
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("admin-app").style.display = "block";
-                if (typeof loadPapers === "function") loadPapers();
-              } else {
-                if (err) err.textContent = data.error || "Invalid password";
-              }
-            } catch (ex) {
-              console.error("Login error:", ex);
-              if (err) err.textContent = "Connection error";
-            }
-
-            if (btn) {
-              btn.disabled = false;
-              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-            }
-          });
-        }
-      })();
-    </script>
-
-    <!-- Main Admin Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="/admin/backup-login.js"></script>
     <script src="/admin/admin.js"></script>
   </body>
 </html>

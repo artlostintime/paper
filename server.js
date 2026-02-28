@@ -1,39 +1,54 @@
-//Dotenv config
+// Dotenv config
 require("dotenv").config();
 
-// Built-in modules
-const http = require("http");
+// Dependencies
+const express = require("express");
 const https = require("https");
 const fs = require("fs");
+const fsPromises = require("fs").promises;
 const path = require("path");
-const url = require("url");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const helmet = require("helmet");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const compression = require("compression");
 const matter = require("gray-matter");
 
+// ============== CONFIG ==============
 const PORT = process.env.PORT || 3000;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 const USE_HTTPS = process.env.USE_HTTPS === "true";
 const PAPERS_DIR = path.join(__dirname, "papers");
+const BCRYPT_ROUNDS = 12;
+const VALID_FILENAME = /^[\w-]+\.md$/;
 
 // ============== AUTHENTICATION CONFIG ==============
-// Set password via environment variable: ADMIN_PASSWORD=yourpassword node server.js
-// Or create a .env file with ADMIN_PASSWORD=yourpassword
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
 if (ADMIN_PASSWORD === "admin123") {
   console.warn(
-    "\n⚠️  WARNING: Using default password! Set ADMIN_PASSWORD environment variable for production.\n"
+    "\n⚠️  WARNING: Using default password! Set ADMIN_PASSWORD environment variable for production.\n",
   );
 }
 
-// Session storage (in-memory - resets on server restart)
+// Hash password at startup with bcrypt
+let hashedPassword = null;
+(async () => {
+  hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, BCRYPT_ROUNDS);
+  console.log("✅ Password hashed with bcrypt");
+})();
+
+// Session storage (in-memory — intentional)
 const sessions = new Map();
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-// Rate limiting - track failed login attempts by IP
+// Rate limiting — track failed login attempts by IP
 const loginAttempts = new Map();
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes
+
+// ============== HELPER FUNCTIONS ==============
 
 function getClientIP(req) {
   return (
@@ -47,32 +62,23 @@ function getClientIP(req) {
 function isRateLimited(ip) {
   const attempts = loginAttempts.get(ip);
   if (!attempts) return false;
-
-  // Check if already at max attempts
   if (attempts.count >= MAX_ATTEMPTS) {
-    // If lockout time was set and expired, clear and allow retry
     if (attempts.lockoutUntil > 0 && Date.now() >= attempts.lockoutUntil) {
       loginAttempts.delete(ip);
       return false;
     }
-    // Still locked out
     return true;
   }
-
   return false;
 }
 
 function recordFailedAttempt(ip) {
   const attempts = loginAttempts.get(ip) || { count: 0, lockoutUntil: 0 };
   attempts.count++;
-
   if (attempts.count >= MAX_ATTEMPTS) {
     attempts.lockoutUntil = Date.now() + LOCKOUT_TIME;
   }
-
   loginAttempts.set(ip, attempts);
-
-  // Return current state for immediate use
   return attempts;
 }
 
@@ -80,12 +86,10 @@ function clearAttempts(ip) {
   loginAttempts.delete(ip);
 }
 
-// Generate secure token
 function generateToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
-// Validate session token
 function isValidSession(token) {
   if (!token || !sessions.has(token)) return false;
   const session = sessions.get(token);
@@ -96,394 +100,626 @@ function isValidSession(token) {
   return true;
 }
 
-// Get token from request (cookie or header)
 function getToken(req) {
-  // Check Authorization header
   const authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
     return authHeader.substring(7);
   }
-  // Check cookies
-  const cookies = req.headers.cookie;
-  if (cookies) {
-    const match = cookies.match(/admin_token=([^;]+)/);
-    if (match) return match[1];
+  if (req.cookies && req.cookies.admin_token) {
+    return req.cookies.admin_token;
   }
   return null;
 }
 
-// Hash password with salt for better security
-function hashPassword(password, salt = "") {
-  return crypto
-    .createHash("sha256")
-    .update(password + salt)
-    .digest("hex");
-}
-
-const PASSWORD_SALT = crypto.randomBytes(16).toString("hex");
-const HASHED_PASSWORD = hashPassword(ADMIN_PASSWORD, PASSWORD_SALT);
-// ===================================================
-
-const MIME_TYPES = {
-  ".html": "text/html",
-  ".css": "text/css",
-  ".js": "application/javascript",
-  ".json": "application/json",
-  ".md": "text/markdown",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
+// Category file mapping (single source of truth — served via /api/categories)
+const CATEGORY_MAP = {
+  clinical: {
+    icon: "fa-user-md",
+    label: "Clinical",
+    files: ["anxiety", "depression", "psychotherapy", "trauma"],
+  },
+  cognitive: {
+    icon: "fa-brain",
+    label: "Cognitive",
+    files: ["cognition", "memory"],
+  },
+  social: {
+    icon: "fa-users",
+    label: "Social",
+    files: ["social", "attachment"],
+  },
+  health: {
+    icon: "fa-heartbeat",
+    label: "Health",
+    files: ["burnout", "sleep", "addiction"],
+  },
+  developmental: {
+    icon: "fa-child",
+    label: "Developmental",
+    files: ["developmental"],
+  },
+  neuroscience: {
+    icon: "fa-dna",
+    label: "Neuroscience",
+    files: ["neuroscience"],
+  },
+  personality: {
+    icon: "fa-fingerprint",
+    label: "Personality",
+    files: ["personality", "motivation"],
+  },
 };
 
-// Helper to parse JSON body
-function parseBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", () => {
+function getCategoryFiles(category) {
+  return CATEGORY_MAP[category]?.files || [];
+}
+
+// Helper: get category key for a filename
+function getFileCategory(filename) {
+  const baseName = filename.replace(".md", "").toLowerCase();
+  for (const [key, value] of Object.entries(CATEGORY_MAP)) {
+    if (value.files.some((f) => baseName.includes(f))) {
+      return key;
+    }
+  }
+  return "other";
+}
+
+// ============== IN-MEMORY SEARCH INDEX ==============
+let searchIndex = new Map(); // filename → { content, mtime }
+
+async function buildSearchIndex() {
+  try {
+    const files = await fsPromises.readdir(PAPERS_DIR);
+    const mdFiles = files.filter((f) => f.endsWith(".md"));
+
+    for (const file of mdFiles) {
       try {
-        resolve(body ? JSON.parse(body) : {});
+        const filePath = path.join(PAPERS_DIR, file);
+        const [content, stats] = await Promise.all([
+          fsPromises.readFile(filePath, "utf8"),
+          fsPromises.stat(filePath),
+        ]);
+        searchIndex.set(file, {
+          content: content.toLowerCase(),
+          raw: content,
+          mtime: stats.mtime,
+          size: stats.size,
+        });
       } catch (e) {
-        reject(e);
+        // Skip unreadable files
       }
+    }
+    console.log(`✅ Search index built (${searchIndex.size} papers)`);
+  } catch (e) {
+    console.error("❌ Failed to build search index:", e.message);
+  }
+}
+
+// Rebuild index on file changes
+function invalidateIndex(filename) {
+  const filePath = path.join(PAPERS_DIR, filename);
+  fsPromises
+    .readFile(filePath, "utf8")
+    .then(async (content) => {
+      const stats = await fsPromises.stat(filePath);
+      searchIndex.set(filename, {
+        content: content.toLowerCase(),
+        raw: content,
+        mtime: stats.mtime,
+        size: stats.size,
+      });
+    })
+    .catch(() => {
+      searchIndex.delete(filename);
     });
-    req.on("error", reject);
+}
+
+// Build index on startup
+buildSearchIndex();
+
+// ============== FILE WATCHER ==============
+// Auto-rebuild search index when papers change on disk (e.g. git pull)
+try {
+  fs.watch(PAPERS_DIR, { persistent: false }, (eventType, filename) => {
+    if (filename && filename.endsWith(".md")) {
+      invalidateIndex(filename);
+    }
+  });
+  console.log("👁️  Watching papers directory for changes");
+} catch (e) {
+  console.warn("⚠️  Could not watch papers directory:", e.message);
+}
+
+// ============== SESSION & RATE-LIMIT CLEANUP ==============
+// Prune expired sessions and stale login attempts every 30 minutes
+setInterval(
+  () => {
+    const now = Date.now();
+    let sessionsPruned = 0;
+    let attemptsPruned = 0;
+
+    for (const [token, session] of sessions) {
+      if (now > session.expires) {
+        sessions.delete(token);
+        sessionsPruned++;
+      }
+    }
+
+    for (const [ip, attempts] of loginAttempts) {
+      if (attempts.lockoutUntil > 0 && now >= attempts.lockoutUntil) {
+        loginAttempts.delete(ip);
+        attemptsPruned++;
+      }
+    }
+
+    if (sessionsPruned || attemptsPruned) {
+      console.log(
+        `🧹 Cleanup: ${sessionsPruned} expired sessions, ${attemptsPruned} stale lockouts removed`,
+      );
+    }
+  },
+  30 * 60 * 1000,
+);
+
+// ============== EXPRESS APP ==============
+const app = express();
+
+// --- Middleware ---
+app.use(express.json({ limit: "1mb" }));
+app.use(cookieParser());
+app.use(compression());
+
+// Helmet — security headers with proper CSP
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.googleapis.com",
+        ],
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com",
+        ],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  }),
+);
+
+// CORS — restricted to localhost
+app.use(
+  cors({
+    origin: [
+      `http://localhost:${PORT}`,
+      `http://127.0.0.1:${PORT}`,
+      `https://localhost:${HTTPS_PORT}`,
+      `https://127.0.0.1:${HTTPS_PORT}`,
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
+// HSTS for HTTPS
+if (USE_HTTPS) {
+  app.use((req, res, next) => {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains",
+    );
+    next();
   });
 }
 
-// Send JSON response
-function sendJSON(res, status, data) {
-  res.writeHead(status, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(data));
-}
+// ============== CSRF PROTECTION ==============
+// Simple origin-check middleware for state-changing requests
+function csrfCheck(req, res, next) {
+  if (
+    req.method === "GET" ||
+    req.method === "HEAD" ||
+    req.method === "OPTIONS"
+  ) {
+    return next();
+  }
 
-// ============== REQUEST HANDLER ==============
-const requestHandler = async (req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
-
-  // CORS headers - restricted to localhost
-  const allowedOrigins = [
+  const origin = req.headers["origin"];
+  const referer = req.headers["referer"];
+  const allowed = [
     `http://localhost:${PORT}`,
     `http://127.0.0.1:${PORT}`,
     `https://localhost:${HTTPS_PORT}`,
     `https://127.0.0.1:${HTTPS_PORT}`,
   ];
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-  }
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  // Security headers
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  // Add HSTS header for HTTPS
-  if (USE_HTTPS) {
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains"
-    );
+  // Allow requests with no origin (same-origin form submits, curl, etc.)
+  if (!origin && !referer) {
+    return next();
   }
 
-  if (req.method === "OPTIONS") {
-    res.writeHead(204);
-    res.end();
-    return;
+  const requestOrigin = origin || new URL(referer).origin;
+  if (allowed.some((a) => requestOrigin === a)) {
+    return next();
   }
 
-  // ============== AUTH ENDPOINTS ==============
+  return res.status(403).json({ error: "Forbidden: invalid origin" });
+}
 
-  // Login endpoint
-  if (pathname === "/api/auth/login" && req.method === "POST") {
-    const clientIP = getClientIP(req);
+app.use(csrfCheck);
 
-    // Check rate limiting
-    if (isRateLimited(clientIP)) {
-      sendJSON(res, 429, {
-        error: "Too many failed attempts. Try again in 15 minutes.",
+// ============== AUTH MIDDLEWARE ==============
+function requireAuth(req, res, next) {
+  const token = getToken(req);
+  if (!isValidSession(token)) {
+    return res.status(401).json({ error: "Unauthorized. Please login." });
+  }
+  next();
+}
+
+// ============== AUTH ROUTES ==============
+
+app.post("/api/auth/login", async (req, res) => {
+  const clientIP = getClientIP(req);
+
+  if (isRateLimited(clientIP)) {
+    return res
+      .status(429)
+      .json({ error: "Too many failed attempts. Try again in 15 minutes." });
+  }
+
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "Password required" });
+    }
+
+    // Wait for hash to be ready (only on very first request after startup)
+    if (!hashedPassword) {
+      hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, BCRYPT_ROUNDS);
+    }
+
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+
+    if (isMatch) {
+      clearAttempts(clientIP);
+      const token = generateToken();
+      sessions.set(token, {
+        created: Date.now(),
+        expires: Date.now() + SESSION_DURATION,
+        ip: clientIP,
       });
-      return;
+
+      res.cookie("admin_token", token, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: SESSION_DURATION,
+        secure: USE_HTTPS,
+      });
+
+      return res.json({ success: true, token });
+    } else {
+      const attempts = recordFailedAttempt(clientIP);
+      const remaining = MAX_ATTEMPTS - attempts.count;
+
+      await new Promise((r) => setTimeout(r, 1000));
+      return res.status(401).json({
+        error:
+          remaining > 0
+            ? `Invalid password. ${remaining} attempts remaining.`
+            : "Account locked. Try again in 15 minutes.",
+      });
     }
-
-    try {
-      const { password } = await parseBody(req);
-
-      if (hashPassword(password, PASSWORD_SALT) === HASHED_PASSWORD) {
-        clearAttempts(clientIP); // Reset on successful login
-        const token = generateToken();
-        sessions.set(token, {
-          created: Date.now(),
-          expires: Date.now() + SESSION_DURATION,
-          ip: clientIP,
-        });
-
-        // Set cookie with Secure flag if HTTPS is enabled
-        const cookieFlags = [
-          `admin_token=${token}`,
-          "Path=/",
-          "HttpOnly",
-          "SameSite=Lax",
-          `Max-Age=${SESSION_DURATION / 1000}`,
-        ];
-
-        if (USE_HTTPS) {
-          cookieFlags.push("Secure"); // Only send over HTTPS
-        }
-
-        res.setHeader("Set-Cookie", cookieFlags.join("; "));
-        sendJSON(res, 200, { success: true, token });
-      } else {
-        // Record failure FIRST, then get the updated state
-        const attempts = recordFailedAttempt(clientIP);
-        const remaining = MAX_ATTEMPTS - attempts.count;
-
-        // Add delay to slow down brute force
-        await new Promise((r) => setTimeout(r, 1000));
-        sendJSON(res, 401, {
-          error:
-            remaining > 0
-              ? `Invalid password. ${remaining} attempts remaining.`
-              : "Account locked. Try again in 15 minutes.",
-        });
-      }
-    } catch (e) {
-      sendJSON(res, 400, { error: "Invalid request" });
-    }
-    return;
+  } catch (e) {
+    console.error("Login error:", e);
+    return res.status(400).json({ error: "Invalid request" });
   }
+});
 
-  // Logout endpoint
-  if (pathname === "/api/auth/logout" && req.method === "POST") {
-    const token = getToken(req);
-    if (token) sessions.delete(token);
-    res.setHeader("Set-Cookie", "admin_token=; Path=/; HttpOnly; Max-Age=0");
-    sendJSON(res, 200, { success: true });
-    return;
-  }
+app.post("/api/auth/logout", (req, res) => {
+  const token = getToken(req);
+  if (token) sessions.delete(token);
+  res.clearCookie("admin_token", { path: "/", httpOnly: true });
+  res.json({ success: true });
+});
 
-  // Check auth status
-  if (pathname === "/api/auth/check" && req.method === "GET") {
-    const token = getToken(req);
-    sendJSON(res, 200, { authenticated: isValidSession(token) });
-    return;
-  }
+app.get("/api/auth/check", (req, res) => {
+  const token = getToken(req);
+  res.json({ authenticated: isValidSession(token) });
+});
 
-  // ============== PROTECTED API ROUTES ==============
-  // Only POST/PUT/DELETE on /api/papers require authentication
-  // GET requests are public (read-only access for the main site)
-  if (pathname.startsWith("/api/papers") && req.method !== "GET") {
-    const token = getToken(req);
-    if (!isValidSession(token)) {
-      sendJSON(res, 401, { error: "Unauthorized. Please login." });
-      return;
-    }
-  }
+// ============== SHARED DATA ==============
 
-  // API: List papers
-  if (pathname === "/api/papers" && req.method === "GET") {
-    fs.readdir(PAPERS_DIR, (err, files) => {
-      if (err) {
-        sendJSON(res, 500, { error: "Could not read papers directory" });
-        return;
-      }
+// Serve the category map so frontend doesn't need its own copy
+app.get("/api/categories", (req, res) => {
+  res.set(
+    "Cache-Control",
+    "public, max-age=3600, stale-while-revalidate=86400",
+  );
+  res.json(CATEGORY_MAP);
+});
 
-      const mdFiles = files.filter((f) => f.endsWith(".md"));
-      const metadata = {};
-      const filesWithStats = [];
+// ============== PAPER ROUTES ==============
 
-      mdFiles.forEach((file) => {
+// List papers (fully async, with sorting)
+app.get("/api/papers", async (req, res) => {
+  const sort = (req.query.sort || "date").toLowerCase(); // date | name | category
+
+  try {
+    const files = await fsPromises.readdir(PAPERS_DIR);
+    const mdFiles = files.filter((f) => f.endsWith(".md"));
+    const metadata = {};
+    const filesWithStats = [];
+
+    await Promise.all(
+      mdFiles.map(async (file) => {
         try {
-          const stats = fs.statSync(path.join(PAPERS_DIR, file));
-          filesWithStats.push({ name: file, mtime: stats.mtime });
+          const stats = await fsPromises.stat(path.join(PAPERS_DIR, file));
+          filesWithStats.push({
+            name: file,
+            mtime: stats.mtime,
+            size: stats.size,
+          });
           metadata[file] = { mtime: stats.mtime, size: stats.size };
         } catch (e) {
-          filesWithStats.push({ name: file, mtime: new Date(0) });
+          filesWithStats.push({ name: file, mtime: new Date(0), size: 0 });
         }
-      });
+      }),
+    );
 
-      filesWithStats.sort((a, b) => new Date(b.mtime) - new Date(a.mtime));
-      sendJSON(res, 200, {
-        files: filesWithStats.map((f) => f.name),
-        metadata: metadata,
-      });
-    });
-    return;
-  }
-
-  // API: Get paper content
-  if (pathname.startsWith("/api/papers/") && req.method === "GET") {
-    const filename = decodeURIComponent(pathname.split("/api/papers/")[1]);
-    const safeName = path.basename(filename);
-    const filePath = path.join(PAPERS_DIR, safeName);
-
-    fs.readFile(filePath, "utf8", (err, content) => {
-      if (err) {
-        sendJSON(res, 404, { error: "File not found" });
-        return;
-      }
-
-      // Parse YAML frontmatter
-      try {
-        const { data: frontmatter, content: markdownContent } = matter(content);
-        sendJSON(res, 200, {
-          content: markdownContent,
-          frontmatter: frontmatter,
-          raw: content, // Keep raw for admin editing
+    // Sort based on query param
+    switch (sort) {
+      case "name":
+        filesWithStats.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "category":
+        filesWithStats.sort((a, b) => {
+          const catA = getFileCategory(a.name);
+          const catB = getFileCategory(b.name);
+          return catA.localeCompare(catB) || a.name.localeCompare(b.name);
         });
+        break;
+      case "date":
+      default:
+        filesWithStats.sort((a, b) => new Date(b.mtime) - new Date(a.mtime));
+        break;
+    }
+
+    res.set("Cache-Control", "public, max-age=10, stale-while-revalidate=30");
+    res.json({
+      files: filesWithStats.map((f) => f.name),
+      metadata,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Could not read papers directory" });
+  }
+});
+
+// Batch preview endpoint — fetch multiple papers in one request
+app.get("/api/papers/batch", async (req, res) => {
+  const fileList = req.query.files;
+  if (!fileList) {
+    return res.status(400).json({ error: "files query parameter required" });
+  }
+
+  const filenames = fileList.split(",").map((f) => f.trim());
+  const results = {};
+
+  await Promise.all(
+    filenames.map(async (filename) => {
+      if (!VALID_FILENAME.test(filename)) return;
+      const safeName = path.basename(filename);
+      const filePath = path.join(PAPERS_DIR, safeName);
+
+      try {
+        const content = await fsPromises.readFile(filePath, "utf8");
+        const { data: frontmatter, content: markdownContent } = matter(content);
+        results[safeName] = { content: markdownContent, frontmatter };
       } catch (e) {
-        // If parsing fails, return raw content
-        sendJSON(res, 200, { content, frontmatter: {}, raw: content });
+        // Skip missing files
       }
+    }),
+  );
+
+  res.json(results);
+});
+
+// Search papers (uses in-memory index — no disk reads per request)
+app.get("/api/papers/search", (req, res) => {
+  const query = (req.query.q || "").toLowerCase().trim();
+  const category = (req.query.category || "all").toLowerCase().trim();
+
+  if (!query && category === "all") {
+    return res.status(400).json({ error: "Search query or category required" });
+  }
+
+  const results = [];
+
+  for (const [file, entry] of searchIndex) {
+    // Category filter by filename
+    if (category !== "all") {
+      const baseName = file.replace(".md", "").toLowerCase();
+      const categoryFiles = getCategoryFiles(category);
+      if (!categoryFiles.some((f) => baseName.includes(f))) {
+        continue;
+      }
+    }
+
+    // Content search using cached index
+    if (query) {
+      if (!entry.content.includes(query)) {
+        continue;
+      }
+    }
+
+    results.push(file);
+  }
+
+  res.set("Cache-Control", "public, max-age=5, stale-while-revalidate=15");
+  res.json({ files: results });
+});
+
+// Get paper content (AFTER /search and /batch to avoid route conflict)
+app.get("/api/papers/:filename", async (req, res) => {
+  const safeName = path.basename(req.params.filename);
+
+  // Strict filename validation
+  if (!VALID_FILENAME.test(safeName)) {
+    return res.status(400).json({ error: "Invalid filename" });
+  }
+
+  const filePath = path.join(PAPERS_DIR, safeName);
+
+  try {
+    const content = await fsPromises.readFile(filePath, "utf8");
+    const { data: frontmatter, content: markdownContent } = matter(content);
+    res.json({ content: markdownContent, frontmatter, raw: content });
+  } catch (err) {
+    return res.status(404).json({ error: "File not found" });
+  }
+});
+
+// Save paper (auth required)
+app.post("/api/papers/save", requireAuth, async (req, res) => {
+  const { filename, content } = req.body;
+
+  if (!filename || !filename.endsWith(".md")) {
+    return res.status(400).json({ error: "Invalid filename" });
+  }
+
+  // Strict filename validation
+  const safeName = path.basename(filename);
+  if (!VALID_FILENAME.test(safeName)) {
+    return res.status(400).json({
+      error:
+        "Invalid filename. Use only letters, numbers, hyphens, and underscores.",
     });
-    return;
   }
 
-  // API: Save paper
-  if (pathname === "/api/papers/save" && req.method === "POST") {
-    try {
-      const { filename, content } = await parseBody(req);
+  const filePath = path.join(PAPERS_DIR, safeName);
 
-      if (!filename || !filename.endsWith(".md")) {
-        sendJSON(res, 400, { error: "Invalid filename" });
-        return;
-      }
+  try {
+    await fsPromises.writeFile(filePath, content, "utf8");
+    invalidateIndex(safeName); // Update search index
+    res.json({ success: true, filename: safeName });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to save file" });
+  }
+});
 
-      const safeName = path.basename(filename);
-      const filePath = path.join(PAPERS_DIR, safeName);
+// Delete paper (auth required)
+app.post("/api/papers/delete", requireAuth, async (req, res) => {
+  const { filename } = req.body;
 
-      fs.writeFile(filePath, content, "utf8", (err) => {
-        if (err) {
-          sendJSON(res, 500, { error: "Failed to save file" });
-          return;
-        }
-        sendJSON(res, 200, { success: true, filename: safeName });
-      });
-    } catch (e) {
-      sendJSON(res, 400, { error: "Invalid request body" });
-    }
-    return;
+  if (!filename) {
+    return res.status(400).json({ error: "Filename required" });
   }
 
-  // API: Delete paper
-  if (pathname === "/api/papers/delete" && req.method === "POST") {
-    try {
-      const { filename } = await parseBody(req);
-
-      if (!filename) {
-        sendJSON(res, 400, { error: "Filename required" });
-        return;
-      }
-
-      const safeName = path.basename(filename);
-      const filePath = path.join(PAPERS_DIR, safeName);
-
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          sendJSON(res, 500, { error: "Failed to delete file" });
-          return;
-        }
-        sendJSON(res, 200, { success: true });
-      });
-    } catch (e) {
-      sendJSON(res, 400, { error: "Invalid request body" });
-    }
-    return;
+  const safeName = path.basename(filename);
+  if (!VALID_FILENAME.test(safeName)) {
+    return res.status(400).json({ error: "Invalid filename" });
   }
 
-  // ============== ADMIN ASSETS ==============
-  // Handle /admin/admin.js, /admin/admin.css, etc.
-  if (pathname.startsWith("/admin/") && pathname !== "/admin/") {
-    const assetPath = pathname.substring(7); // Remove "/admin/" prefix
-    const assetFile = path.join(__dirname, "public", "admin", assetPath);
+  const filePath = path.join(PAPERS_DIR, safeName);
 
-    const ext = path.extname(assetFile).toLowerCase();
-    const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  try {
+    await fsPromises.unlink(filePath);
+    invalidateIndex(safeName); // Remove from search index
+    res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete file" });
+  }
+});
 
-    fs.readFile(assetFile, (err, content) => {
-      if (err) {
-        if (err.code === "ENOENT") {
-          res.writeHead(404, { "Content-Type": "text/html" });
-          res.end("<h1>404 - File Not Found</h1>");
-        } else {
-          res.writeHead(500);
-          res.end(`Server Error: ${err.code}`);
-        }
-      } else {
-        const cacheableTypes = [".css", ".js", ".png", ".jpg", ".svg", ".ico"];
-        const headers = { "Content-Type": contentType };
-        if (cacheableTypes.includes(ext)) {
-          headers["Cache-Control"] = "public, max-age=86400";
-        }
-        res.writeHead(200, headers);
-        res.end(content);
-      }
-    });
-    return;
+// ============== STATIC FILES ==============
+
+// Admin panel
+app.use(
+  "/admin",
+  express.static(path.join(__dirname, "public", "admin"), {
+    maxAge: "1d",
+    index: "index.html",
+  }),
+);
+
+// Public files
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "1d",
+  }),
+);
+
+// ============== 404 HANDLER ==============
+app.use((req, res) => {
+  // For API routes, return JSON
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).json({ error: "Not found" });
   }
 
-  // ============== STATIC FILES ==============
-  let filePath = pathname === "/" ? "/public/index.html" : pathname;
+  // For HTML requests, serve a themed 404 page
+  res.status(404).send(`<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 | Not Found</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <main id="main-content">
+    <div class="paper-not-found">
+      <i class="fas fa-compass"></i>
+      <h1>404 — Page Not Found</h1>
+      <p>The page you're looking for doesn't exist or has been moved.</p>
+      <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </div>
+  </main>
+  <script src="/js/theme-init.js"></script>
+</body>
+</html>`);
+});
 
-  // Handle /admin route
-  if (pathname === "/admin" || pathname === "/admin/") {
-    filePath = "/public/admin/index.html";
+// ============== GLOBAL ERROR HANDLER ==============
+app.use((err, req, res, _next) => {
+  console.error("Unhandled error:", err);
+
+  if (req.path.startsWith("/api/")) {
+    return res.status(500).json({ error: "Internal server error" });
   }
 
-  // Prefix all non-API paths with /public
-  if (!filePath.startsWith("/public/") && !pathname.startsWith("/api/")) {
-    filePath = "/public" + filePath;
-  }
-
-  filePath = path.join(__dirname, filePath);
-
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME_TYPES[ext] || "application/octet-stream";
-
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      if (err.code === "ENOENT") {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.end("<h1>404 - File Not Found</h1>");
-      } else {
-        res.writeHead(500);
-        res.end(`Server Error: ${err.code}`);
-      }
-    } else {
-      // Add caching headers for static assets
-      const cacheableTypes = [
-        ".css",
-        ".js",
-        ".png",
-        ".jpg",
-        ".svg",
-        ".ico",
-        ".woff",
-        ".woff2",
-      ];
-      const headers = { "Content-Type": contentType };
-      if (cacheableTypes.includes(ext)) {
-        headers["Cache-Control"] = "public, max-age=86400"; // 1 day
-      }
-      res.writeHead(200, headers);
-      res.end(content);
-    }
-  });
-};
+  res.status(500).send(`<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Error</title></head>
+<body style="font-family: sans-serif; text-align: center; padding: 4rem;">
+  <h1>Something went wrong</h1>
+  <p>Please try again later.</p>
+  <a href="/">Back to Home</a>
+</body></html>`);
+});
 
 // ============== SERVER CREATION ==============
 
 if (USE_HTTPS) {
-  // Load SSL certificates
   const keyPath =
     process.env.SSL_KEY_PATH || path.join(__dirname, "ssl", "key.pem");
   const certPath =
@@ -499,43 +735,37 @@ if (USE_HTTPS) {
   } catch (error) {
     console.error("❌ Failed to load SSL certificates:", error.message);
     console.log(
-      "\n📝 Generate certificates with:\n   openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj '/CN=localhost'\n"
+      "\n📝 Generate certificates with:\n   openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj '/CN=localhost'\n",
     );
     process.exit(1);
   }
 
-  // Create HTTPS server
-  const httpsServer = https.createServer(httpsOptions, requestHandler);
+  const httpsServer = https.createServer(httpsOptions, app);
   httpsServer.listen(HTTPS_PORT, () => {
     console.log(`\n🔒 HTTPS Server running at https://localhost:${HTTPS_PORT}`);
     console.log(`📁 Papers directory: ${PAPERS_DIR}`);
     console.log(`🔐 Admin panel: https://localhost:${HTTPS_PORT}/admin`);
     console.log(
-      `\n⚠️  Using self-signed certificate - browsers will show warning`
+      `\n⚠️  Using self-signed certificate — browsers will show warning\n`,
     );
-    console.log(`   Password: ${ADMIN_PASSWORD}\n`);
   });
 
-  // Optional: HTTP redirect server
-  const httpRedirectServer = http.createServer((req, res) => {
-    res.writeHead(301, {
-      Location: `https://${req.headers.host.replace(PORT, HTTPS_PORT)}${
-        req.url
-      }`,
-    });
-    res.end();
+  // HTTP → HTTPS redirect
+  const http = require("http");
+  const redirectApp = express();
+  redirectApp.all("*", (req, res) => {
+    res.redirect(
+      301,
+      `https://${req.headers.host.replace(PORT, HTTPS_PORT)}${req.url}`,
+    );
   });
-
-  httpRedirectServer.listen(PORT, () => {
+  http.createServer(redirectApp).listen(PORT, () => {
     console.log(`↪️  HTTP→HTTPS redirect on http://localhost:${PORT}\n`);
   });
 } else {
-  // Create HTTP server (development)
-  const httpServer = http.createServer(requestHandler);
-  httpServer.listen(PORT, () => {
-    console.log(`\n🚀 HTTP Server running at http://localhost:${PORT}`);
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Server running at http://localhost:${PORT}`);
     console.log(`📁 Papers directory: ${PAPERS_DIR}`);
     console.log(`🔐 Admin panel: http://localhost:${PORT}/admin`);
-    console.log(`\n⚠️  Password: ${ADMIN_PASSWORD}\n`);
   });
 }

@@ -1,0 +1,66 @@
+@use "../abstracts" as *;
+
+.hero-section {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+
+  .chapter-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    margin-bottom: $space-xl;
+    letter-spacing: -0.03em;
+  }
+
+  .lead-text {
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    max-width: 560px;
+  }
+
+  // Accent line before intro
+  &::before {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: $radius-full;
+    margin-bottom: $space-xl;
+  }
+}
+
+.scroll-cue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: $space-3xl;
+  opacity: 0.5;
+  transition: opacity $ease-normal;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  i {
+    animation: scrollBounce 2s ease-in-out infinite;
+    font-size: 0.65rem;
+  }
+}
+
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}

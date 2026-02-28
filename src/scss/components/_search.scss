@@ -1,0 +1,124 @@
+@use "../abstracts" as *;
+
+.search-container {
+  position: relative;
+  margin-bottom: $space-lg;
+  max-width: 420px;
+
+  input {
+    width: 100%;
+    padding: 14px 40px 14px 46px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-full;
+    color: var(--text-primary);
+    transition: all $ease-fast;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+      background: var(--bg-card);
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+
+    &:focus ~ .search-hint,
+    &:not(:placeholder-shown) ~ .search-hint {
+      opacity: 0;
+    }
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 0.85rem;
+}
+
+.clear-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  @include flex-center;
+  border-radius: $radius-full;
+  transition: all $ease-fast;
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--border);
+  }
+}
+
+.search-hint {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  background: var(--border);
+  border: 1px solid var(--border-strong);
+  border-radius: $radius-sm;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: opacity $ease-fast;
+}
+
+// ── Category filter pills ───────────────────────
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: $space-lg;
+}
+
+.filter-btn {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: $radius-full;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all $ease-fast;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    background: var(--bg-surface);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  &.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+
+  i {
+    font-size: 0.7rem;
+  }
+}

@@ -1,0 +1,166 @@
+@use "../abstracts" as *;
+
+// ── Side panel ──────────────────────────────────
+.side-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: $panel-width;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--panel-bg);
+  color: #e0e0e0;
+  padding: $space-4xl $space-2xl $space-2xl;
+  transform: translateX(-100%);
+  transition: transform $ease-panel;
+  z-index: $z-panel;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  @include respond-to($bp-mobile) {
+    width: 100%;
+    padding: $space-3xl $space-xl $space-xl;
+  }
+}
+
+// ── Close button ────────────────────────────────
+.close-btn {
+  position: absolute;
+  top: $space-xl;
+  right: $space-xl;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: $radius-sm;
+  transition: all $ease-fast;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// ── Panel header ────────────────────────────────
+.panel-header {
+  margin-bottom: $space-3xl;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+}
+
+.role {
+  font-family: var(--font-sans);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// ── Navigation links ────────────────────────────
+.panel-links {
+  list-style: none;
+  flex-grow: 1;
+
+  li {
+    margin-bottom: 4px;
+    position: relative;
+  }
+}
+
+.nav-link {
+  font-family: var(--font-sans);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.9rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: $radius-sm;
+  transition: all $ease-fast;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: var(--accent);
+    font-weight: 500;
+    background: rgba(212, 168, 83, 0.08);
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 0 $radius-sm $radius-sm 0;
+    }
+  }
+}
+
+// ── Theme toggle ────────────────────────────────
+.panel-footer {
+  margin-top: auto;
+  padding-top: $space-xl;
+}
+
+.theme-btn-outlined {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  @include flex-center;
+  gap: 10px;
+  transition: all $ease-fast;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(212, 168, 83, 0.06);
+  }
+}
+
+// ── Overlay ─────────────────────────────────────
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all $ease-normal;
+  z-index: $z-overlay;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}

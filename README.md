@@ -1,642 +1,312 @@
 # 🧠 Psychology Portfolio
 
-A modern, minimalist portfolio website for psychology research papers, built with vanilla JavaScript and a markdown-based content system.
+A clean, fast portfolio site for psychology research papers. Write in Markdown, manage through a VS Code-style admin panel, and publish instantly — no database needed.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Run the server
 node server.js
 ```
 
-Visit `http://localhost:3000` for the public site or `http://localhost:3000/admin` for the admin panel.
-
-**Default admin password:** `admin123`
-
-## 📚 Documentation
-
-See the [`docs/`](docs) folder for comprehensive documentation:
-
-- **[Getting Started](docs/GETTING_STARTED.md)** - Installation and setup
-- **[Admin Guide](docs/ADMIN_GUIDE.md)** - Using the admin panel
-- **[Features](docs/FEATURES.md)** - Complete feature list
-- **[Keyboard Shortcuts](docs/SHORTCUTS.md)** - All shortcuts
-- **[API Reference](docs/API.md)** - Server API endpoints
-- **[Architecture](docs/ARCHITECTURE.md)** - Technical overview
-- **[Changelog](docs/CHANGELOG.md)** - Update history
-
-## ✨ Key Features
-
-- 📝 Markdown editor with live preview
-- 🏷️ YAML frontmatter support for metadata
-- 🔐 Secure authentication system
-- 📤 Export to Markdown, HTML, Text, PDF
-- 🎨 Dark/Light theme toggle
-- ⌨️ Keyboard shortcuts for productivity
-- 📁 Drag & drop file upload
-- 🎯 Distraction-free writing mode
-- 📋 Multiple paper templates (all with YAML)
-- 🔍 Search and category filtering
-
-## 🛠️ Tech Stack
-
-- **Backend:** Node.js (native HTTP/HTTPS)
-- **Frontend:** Vanilla JavaScript
-- **Markdown:** marked.js + KaTeX
-- **Metadata:** gray-matter (YAML frontmatter)
-- **Storage:** File system (no database)
-- **Security:** DOMPurify, HttpOnly cookies
-
-## 📦 Project Structure
-
-```
-port/
-├── server.js           # Node.js server
-├── papers/             # Paper storage
-├── public/             # Public site
-│   ├── admin/         # Admin panel
-│   ├── css/           # Stylesheets
-│   └── js/            # JavaScript
-├── docs/              # Documentation
-└── ssl/               # SSL certificates (optional)
-```
-
-echo ADMIN_PASSWORD=your_secure_password > .env
-
-````
-
-### Start the Server
-
-```bash
-node server.js
-````
-
-The server will start on **http://localhost:3000**
-
-**Default admin password:** `admin123` (change this in `.env` or `server.js`)
-
-### Access Points
-
-- **Public Site:** http://localhost:3000
-- **Admin Panel:** http://localhost:3000/admin
-- **API Endpoint:** http://localhost:3000/api/papers
-
-### Stop the Server
-
-Press `Ctrl + C` in the terminal.
+Open **http://localhost:3000** — that's it.  
+Admin panel lives at **http://localhost:3000/admin** (default password: `admin123`).
 
 ---
 
-## 📝 Managing Papers
+## What This Is
 
-### Adding a New Paper
+A self-hosted website that turns Markdown files into a polished research portfolio. You drop `.md` files into a folder (or write them in the built-in editor), and they show up on your site with categories, search, math rendering, and citations.
 
-1. **Create a markdown file** in the `papers/` folder:
+**Public site** — readers browse your papers with search, category filters, and a clean reading experience.  
+**Admin panel** — you write and manage papers in a VS Code-style editor with live preview.
 
-   ```bash
-   papers/your-paper-title.md
-   ```
+---
 
-2. **Use this template:**
+## Features
+
+### The Editor
+
+- Split-pane Markdown editor with **live preview**
+- **Syntax highlighting** right in the textarea (headings, bold, code, math, etc.)
+- **Slash commands** — type `/` for quick insertions (headings, links, tables, math...)
+- **Auto-pairs** — brackets, quotes, and markdown markers auto-close and wrap selections
+- **List continuation** — press Enter after a list item to auto-continue
+- **Find & Replace** (Ctrl+F / Ctrl+H) with regex and case-sensitive modes
+- **Line numbers**, word count, cursor position
+- **7 paper templates** — Research, Literature Review, Clinical Case, Experiment, etc.
+- **YAML frontmatter** support for metadata (title, author, date, tags)
+- **Drag & drop** `.md` files directly into the editor
+- **Export** to Markdown, HTML, Plain Text, or PDF
+- **Autosave** with 3-second debounce
+- **Undo/redo** works correctly (all edits are undo-safe)
+- **Zen mode** (F11) — distraction-free fullscreen writing
+
+### The Public Site
+
+- Papers displayed as cards with category badges, reading time, and "New" indicators
+- **Server-side search** with category filtering
+- **7 auto-categories** based on filename (Clinical, Cognitive, Social, Health, etc.)
+- Dark/light theme with no flash on load
+- **KaTeX** math rendering (inline `$...$` and display `$$...$$`)
+- **Citation system** — APA, MLA, Chicago, Harvard, BibTeX with one-click copy
+- Reading progress bar, social sharing, APA-formatted print
+- Responsive design — works on mobile
+
+### Security
+
+- **bcrypt** password hashing (12 rounds)
+- **Rate limiting** — 5 failed logins → 15-minute lockout
+- **24-hour sessions** with HttpOnly cookies
+- **Helmet** CSP headers, CORS restricted to localhost
+- **CSRF** origin validation on all POST requests
+- **DOMPurify** sanitization on all rendered HTML (including exports)
+- Optional HTTPS with auto-redirect
+
+---
+
+## Project Structure
+
+```
+paper/
+├── server.js              # Express server (auth, API, static files)
+├── papers/                # Your .md files live here
+├── public/
+│   ├── index.html         # Public homepage
+│   ├── paper.html         # Single paper reader
+│   ├── css/main.css       # Compiled styles
+│   ├── js/
+│   │   ├── main.js        # Homepage logic
+│   │   ├── paper.js       # Paper reader logic
+│   │   └── theme-init.js  # Prevents theme flash
+│   └── admin/
+│       ├── index.html     # Admin panel
+│       ├── admin.js       # Editor logic (~2600 lines)
+│       └── admin.css      # Compiled admin styles
+├── src/scss/              # SCSS source (7-folder architecture)
+├── docs/                  # Documentation
+└── package.json
+```
+
+---
+
+## Writing Papers
+
+### Option 1: Admin Panel
+
+1. Go to `/admin` and log in
+2. Click **New Paper** (or Ctrl+N)
+3. Pick a template or start from scratch
+4. Write your paper — preview updates live
+5. Hit **Save** (Ctrl+S)
+
+### Option 2: Just Drop a File
+
+Create a `.md` file in the `papers/` folder. The server picks it up automatically — no restart needed.
+
+### Paper Format
 
 ```markdown
 ---
-title: Paper Title Here
-author: Author Name
-date: 2026-01-02
-tags: [research, psychology]
-category: Clinical
+title: My Research Paper
+author: Your Name
+date: 2026-01-15
+tags: [burnout, psychology, mixed-methods]
+category: Health
 ---
 
-# Paper Title Here
+# My Research Paper
 
-_Author Name • Published YEAR_
+_Your Name • Published 2026_
 
-Brief abstract or description...
+## Abstract
+
+Your abstract here...
 
 ## Introduction
 
-Content here...
-
-## Method
-
-### Participants
-
-Description...
-
-### Procedure
-
-Steps...
-
-## Results
-
-You can use inline math: $M = 25.3$, $SD = 4.2$
+Content with inline math: $M = 25.3$, $SD = 4.2$
 
 Display equations:
 $$r = .45, p < .001$$
 
-## Discussion
+## Method
 
-Discussion content...
-
-## Conclusion
-
-Final thoughts...
+...
 
 **Reference:**
-Author, A. A. (Year). Title of article. _Journal Name_, Vol(Issue), pages. https://doi.org/xxxxx
+Author, A. (2026). Title. _Journal_, 1(2), 10-20. https://doi.org/xxxxx
 
 [Read Full Article](https://doi.org/xxxxx)
 ```
 
-3. **YAML frontmatter** (optional but recommended):
-
-   - Add metadata between `---` delimiters at file start
-   - Hidden in previews, visible only when editing
-   - Use the YAML button in admin panel for quick insertion
-
-4. **No restart needed** - papers load dynamically via API
-
-### Using the Admin Panel
-
-1. Navigate to **http://localhost:3000/admin**
-2. Login with your admin password
-3. Features:
-   - Create new papers with templates
-   - Edit existing papers with live preview
-   - YAML frontmatter insertion button
-   - Delete papers
-   - Export to MD/HTML/TXT/PDF
-   - Drag & drop file upload
-   - Dark/Light theme toggle
-   - Adjustable font sizes
-   - Distraction-free mode (F11)
-   - Autosave (2-second debounce)
-   - Markdown and math syntax highlighting
-
-### Editing Papers Manually
-
-Simply edit the `.md` files in the `papers/` folder and refresh the browser. The server reads files on-demand.
-
-### Deleting Papers
-
-- **Via Admin Panel:** Select paper and click Delete
-- **Manually:** Delete the `.md` file from `papers/` folder
+The YAML frontmatter (between `---`) is optional but recommended — it's hidden in previews and used for metadata.
 
 ---
 
-## 🏷️ Category System
+## Categories
 
-Papers are automatically categorized based on **filename keywords**.
+Papers are auto-categorized by **filename keywords**:
 
-### Available Categories
+| Category      | Keywords                                   | Example filename          |
+| ------------- | ------------------------------------------ | ------------------------- |
+| Clinical      | anxiety, depression, psychotherapy, trauma | `anxiety-treatment.md`    |
+| Cognitive     | cognition, memory                          | `memory-consolidation.md` |
+| Social        | social, attachment                         | `social-media-effects.md` |
+| Health        | burnout, sleep, addiction                  | `burnout-teachers.md`     |
+| Developmental | developmental                              | `developmental-stages.md` |
+| Neuroscience  | neuroscience                               | `neuroscience-emotion.md` |
+| Personality   | personality, motivation                    | `motivation-theory.md`    |
 
-Edit `CATEGORY_MAP` in [`public/js/main.js`](public/js/main.js) (around line 145):
+No match → **Other**. Categories are defined once in `server.js` and served via API.
 
-| Category      | Filename Keywords                          | Icon             |
-| ------------- | ------------------------------------------ | ---------------- |
-| Clinical      | anxiety, depression, psychotherapy, trauma | `fa-user-md`     |
-| Cognitive     | cognition, memory                          | `fa-brain`       |
-| Social        | social, attachment                         | `fa-users`       |
-| Health        | burnout, sleep, addiction                  | `fa-heartbeat`   |
-| Developmental | developmental                              | `fa-child`       |
-| Neuroscience  | neuroscience                               | `fa-dna`         |
-| Personality   | personality, motivation                    | `fa-fingerprint` |
-| Other         | _(no match)_                               | `fa-file-alt`    |
+---
 
-### Examples
+## Configuration
 
-- `burnout-teachers.md` → **Health** (contains "burnout")
-- `social-anxiety.md` → **Clinical** (matches "anxiety" first)
-- `random-notes.md` → **Other** (no keywords match)
+### Password
 
-### Adding New Categories
+Create a `.env` file:
 
-```javascript
-const CATEGORY_MAP = {
-  // Existing categories...
-
-  // Add new category:
-  methods: {
-    icon: "fa-flask", // Font Awesome icon class
-    label: "Research Methods", // Display name
-    files: ["statistics", "qualitative", "methodology"], // Filename keywords
-  },
-};
+```
+ADMIN_PASSWORD=your_secure_password
 ```
 
----
+Or set it as an environment variable. If you don't set one, it defaults to `admin123` (with a console warning).
 
-## 🔐 Authentication & Security
+### Server Options
 
-### Setting Admin Password
+All configurable in `server.js` or via environment variables:
 
-**Option 1: Environment Variable (Recommended)**
+| Setting            | Default    | Env Variable |
+| ------------------ | ---------- | ------------ |
+| Port               | 3000       | `PORT`       |
+| HTTPS Port         | 3443       | `HTTPS_PORT` |
+| Enable HTTPS       | false      | `USE_HTTPS`  |
+| Session length     | 24 hours   | —            |
+| Failed login limit | 5 attempts | —            |
+| Lockout duration   | 15 minutes | —            |
+
+### SCSS
+
+Styles are written in SCSS (53 partials, 7-folder architecture) and compiled to CSS:
 
 ```bash
-# Create .env file
-echo ADMIN_PASSWORD=your_secure_password > .env
-```
-
-**Option 2: Direct in server.js**
-
-```javascript
-const ADMIN_PASSWORD = "your_secure_password";
-```
-
-### Security Features
-
-- **Session-based authentication** with HttpOnly cookies
-- **Rate limiting:** 5 failed attempts → 15-minute lockout per IP
-- **Password hashing** with SHA-256 and random salt
-- **Session expiration:** 24 hours
-- **CORS restrictions:** localhost only
-- **Protected endpoints:** Only GET `/api/papers` is public; POST/PUT/DELETE require authentication
-- **Path traversal protection** via `path.basename()`
-- **Security headers:** X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
-
-### API Endpoints
-
-| Method | Endpoint                | Auth Required | Description                   |
-| ------ | ----------------------- | ------------- | ----------------------------- |
-| GET    | `/api/papers`           | No            | List all papers with metadata |
-| GET    | `/api/papers/:filename` | No            | Get paper content             |
-| POST   | `/api/papers/save`      | Yes           | Create/update paper           |
-| POST   | `/api/papers/delete`    | Yes           | Delete paper                  |
-| POST   | `/api/auth/login`       | No            | Authenticate with password    |
-| POST   | `/api/auth/logout`      | No            | Clear session                 |
-| GET    | `/api/auth/check`       | No            | Check authentication status   |
-
----
-
-## 🎨 Customization
-
-### Changing Colors
-
-Edit CSS variables in [`public/css/main.css`](public/css/main.css):
-
-```css
-:root {
-  /* Dark Mode Colors */
-  --bg-body: #1a1a1b; /* Page background */
-  --bg-card: #1f1f20; /* Card backgrounds */
-  --text-main: #e5e5e5; /* Main text */
-  --text-muted: #888; /* Secondary text */
-  --accent: #b74b4b; /* Accent color */
-  --accent-hover: #c55555; /* Hover state */
-  --line: #333; /* Borders/dividers */
-}
-
-[data-theme="light"] {
-  /* Light Mode - override variables */
-  --bg-body: #f5f5f5;
-  --bg-card: #ffffff;
-  --text-main: #1a1a1b;
-  --text-muted: #666;
-  --accent: #b74b4b;
-  --line: #ddd;
-}
-```
-
-### Changing Fonts
-
-1. **Update font imports** in `public/index.html` and `public/paper.html`:
-
-```html
-<link
-  href="https://fonts.googleapis.com/css2?family=Your+Font:wght@400;600&display=swap"
-  rel="stylesheet"
-/>
-```
-
-2. **Update CSS variables:**
-
-```css
-:root {
-  --font-sans: "Your Sans Font", system-ui, sans-serif;
-  --font-serif: "Your Serif Font", Georgia, serif;
-  --font-mono: "Your Mono Font", monospace;
-}
-```
-
-### Personalizing Content
-
-**In `public/index.html`:**
-
-- Update name, title, bio in intro section
-- Replace email address in contact section
-- Update social media links (GitHub, LinkedIn, Twitter, ORCID)
-- Modify timeline events
-- Update technical skills in tech grid
-- Change location and timezone
-
-**Site-wide Settings:**
-
-- **Favicon:** Edit inline SVG in `<link rel="icon">` tag
-- **Meta tags:** Update `<title>`, `<meta name="description">`, OpenGraph tags
-- **Analytics:** Add tracking scripts before `</body>` tag
-
----
-
-## ⚙️ Configuration
-
-### Frontend Settings
-
-Edit in [`public/js/main.js`](public/js/main.js):
-
-```javascript
-// Initial papers shown on homepage (before "View More")
-const ITEMS_INITIAL = 4;
-
-// Papers per page after full view/pagination
-const ITEMS_PER_PAGE = 10;
-
-// Days a paper is marked as "New" (recent badge)
-const RECENT_DAYS = 7;
-```
-
-### Server Configuration
-
-Edit in [`server.js`](server.js):
-
-```javascript
-// Server port
-const PORT = process.env.PORT || 3000;
-
-// Papers directory
-const PAPERS_DIR = path.join(__dirname, "papers");
-
-// Session duration (milliseconds)
-const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-
-// Rate limiting
-const MAX_ATTEMPTS = 5; // Failed login attempts
-const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes
+npm run scss          # Compile once
+npm run scss:watch    # Watch for changes
+npm run build         # Compressed production build
 ```
 
 ---
 
-## 📱 Features
+## API
 
-| Feature                | How to Use                                   |
-| ---------------------- | -------------------------------------------- |
-| **Search Papers**      | Type in search box or press `/` key          |
-| **Filter by Category** | Click category buttons above paper grid      |
-| **Dark/Light Mode**    | Click theme toggle in side panel             |
-| **View Paper**         | Click paper title or "Read More" link        |
-| **Copy Email**         | Click copy icon next to email address        |
-| **Back to Top**        | Scroll down, click floating arrow button     |
-| **Timeline Scroll**    | Click and drag timeline (mouse/touch)        |
-| **Admin Panel**        | Navigate to `/admin`, login with password    |
-| **Create Paper**       | Admin panel → "New Paper" button             |
-| **Edit Paper**         | Admin panel → Select paper from dropdown     |
-| **Delete Paper**       | Admin panel → "Delete" button (with confirm) |
-
-### Keyboard Shortcuts
-
-- `Esc` — Close side panel
-- `/` — Focus search input
-- `←` / `→` — Navigate pagination (when available)
+| Method | Endpoint                                | Auth | Description                                     |
+| ------ | --------------------------------------- | ---- | ----------------------------------------------- |
+| GET    | `/api/papers`                           | No   | List papers (with `?sort=date\|name\|category`) |
+| GET    | `/api/papers/:file`                     | No   | Get single paper                                |
+| GET    | `/api/papers/batch?files=a.md,b.md`     | No   | Get multiple papers                             |
+| GET    | `/api/papers/search?q=...&category=...` | No   | Search papers                                   |
+| GET    | `/api/categories`                       | No   | Get category map                                |
+| POST   | `/api/papers/save`                      | Yes  | Create/update paper                             |
+| POST   | `/api/papers/delete`                    | Yes  | Delete paper                                    |
+| POST   | `/api/auth/login`                       | No   | Login                                           |
+| POST   | `/api/auth/logout`                      | No   | Logout                                          |
+| GET    | `/api/auth/check`                       | No   | Check auth status                               |
 
 ---
 
-## 🌐 Deployment
+## Keyboard Shortcuts
 
-### Option 1: Vercel (Recommended)
+### General
 
-1. Push code to GitHub
-2. Go to [vercel.com](https://vercel.com) and import repository
-3. Vercel auto-detects Node.js setup
-4. Add environment variable: `ADMIN_PASSWORD=your_password`
-5. Deploy!
+| Shortcut     | Action                             |
+| ------------ | ---------------------------------- |
+| Ctrl+S       | Save                               |
+| Ctrl+N       | New Paper                          |
+| Ctrl+P       | Command Palette                    |
+| Ctrl+B       | Toggle Sidebar (or Bold in editor) |
+| Ctrl+Shift+T | Toggle Theme                       |
+| F11          | Zen Mode                           |
+| Esc          | Close modals / Exit Zen            |
 
-### Option 2: Render
+### Editor
 
-1. Push code to GitHub
-2. Create new Web Service on [render.com](https://render.com)
-3. Set:
-   - **Build Command:** `npm install`
-   - **Start Command:** `node server.js`
-   - **Environment Variable:** `ADMIN_PASSWORD=your_password`
-4. Deploy!
+| Shortcut        | Action          |
+| --------------- | --------------- |
+| Ctrl+B          | Bold            |
+| Ctrl+I          | Italic          |
+| Ctrl+K          | Insert Link     |
+| Ctrl+D          | Duplicate Line  |
+| Ctrl+F          | Find            |
+| Ctrl+H          | Find & Replace  |
+| Tab / Shift+Tab | Indent / Dedent |
+| Ctrl+\+/\-      | Font Size       |
+| /               | Slash commands  |
 
-### Option 3: Railway
+---
 
-1. Push to GitHub
-2. Import project on [railway.app](https://railway.app)
-3. Add environment variable `ADMIN_PASSWORD`
-4. Railway auto-detects Node.js
+## Deployment
 
-### Option 4: Self-Hosted (VPS/Server)
+### Vercel / Render / Railway
+
+Push to GitHub, import into your platform, set `ADMIN_PASSWORD` as an env variable. It auto-detects Node.js.
+
+### Self-Hosted
 
 ```bash
-# Install PM2 for process management
 npm install -g pm2
-
-# Start server (runs in background)
 pm2 start server.js --name portfolio
-
-# Auto-restart on system reboot
-pm2 startup
-pm2 save
-
-# View logs
-pm2 logs portfolio
-
-# Restart after changes
-pm2 restart portfolio
-
-# Stop server
-pm2 stop portfolio
-```
-
-### Environment Variables for Production
-
-```bash
-# .env file
-ADMIN_PASSWORD=your_very_secure_password_here
-PORT=3000
-NODE_ENV=production
-```
-
-**⚠️ Important:** Never commit `.env` file to git (it's in `.gitignore` by default).
-
----
-
-## 🐛 Troubleshooting
-
-### Server Issues
-
-**"Could not load papers" error**
-
-- ✅ Ensure server is running: `node server.js`
-- ✅ Check terminal for error messages
-- ✅ Verify `papers/` folder exists with `.md` files
-- ✅ Check you're accessing `http://localhost:3000` (not opening HTML file directly)
-
-**Port already in use**
-
-```bash
-# Change port in server.js or use environment variable
-PORT=3001 node server.js
-```
-
-**Server crashes immediately**
-
-- Check for syntax errors in `server.js`
-- Ensure `papers/` directory exists
-- Check file permissions
-
-### Frontend Issues
-
-**Papers not showing category**
-
-- Check filename contains keyword from `CATEGORY_MAP`
-- Keywords are case-insensitive
-
-**Styles look broken**
-
-- Hard refresh: `Ctrl + Shift + R` (Windows/Linux) or `Cmd + Shift + R` (Mac)
-- Check browser console (F12) for errors
-- Verify [`public/css/main.css`](public/css/main.css) exists
-
-**Math equations not rendering**
-
-- KaTeX loads from CDN (requires internet)
-- Use `$...$` for inline math, `$$...$$` for display equations
-- Check browser console for KaTeX errors
-
-**Search not working**
-
-- Papers must be loaded first (wait for skeleton loader to disappear)
-- Check browser console (F12) for JavaScript errors
-
-**Changes not appearing**
-
-- Restart server after editing server-side files (`server.js`)
-- Hard refresh browser after editing frontend files: `Ctrl + Shift + R`
-- Check browser cache is not disabled in DevTools
-
-### Admin Panel Issues
-
-**Can't login**
-
-- Verify password matches `ADMIN_PASSWORD` in `.env` or `server.js`
-- Check for rate limiting (5 failed attempts = 15min lockout)
-- Clear cookies and try again
-
-**"Unauthorized" when saving**
-
-- Session may have expired (24 hours)
-- Re-login to admin panel
-- Check browser cookies are enabled
-
-**Papers not saving**
-
-- Check filename has `.md` extension
-- Verify server has write permissions to `papers/` folder
-- Check browser console and server terminal for errors
-
-### Common Mistakes
-
-❌ **Opening HTML file directly:** `file:///C:/path/to/public/index.html`
-
-- ✅ **Use server:** `http://localhost:3000`
-
-❌ **Using `/papers/file.md` instead of `/api/papers/file.md`**
-
-- ✅ All API calls must go through `/api/` prefix
-
-❌ **Forgetting `.md` extension** when creating papers
-
-- ✅ All paper files must end with `.md`
-
----
-
-## 📋 Development Checklist
-
-### Initial Setup
-
-```
-✅ Install Node.js
-✅ Run `npm install`
-✅ Create `.env` with ADMIN_PASSWORD
-✅ Add at least one paper in `papers/` folder
-✅ Start server: `node server.js`
-✅ Access http://localhost:3000
-✅ Test admin login at http://localhost:3000/admin
-```
-
-### Customization
-
-```
-✅ Update personal info in public/index.html (name, email, bio)
-✅ Update social links (GitHub, LinkedIn, ORCID, Twitter)
-✅ Modify timeline events in index.html
-✅ Update technical skills section
-✅ Change colors in public/css/main.css
-✅ Add/modify categories in public/js/main.js
-✅ Customize favicon (emoji or image)
-```
-
-### Before Deployment
-
-```
-✅ Set strong ADMIN_PASSWORD in environment
-✅ Test all papers load correctly
-✅ Test admin panel create/edit/delete
-✅ Verify search and filtering work
-✅ Test on mobile viewport
-✅ Check dark/light theme switching
-✅ Remove `.github/` folder if not using Copilot
-✅ Update README with your specifics
+pm2 startup && pm2 save
 ```
 
 ---
 
-## 🔧 Tech Stack
+## Troubleshooting
 
-- **Server:** Node.js HTTP module (no Express)
-- **Frontend:** Vanilla JavaScript (no frameworks)
-- **Styling:** CSS with custom properties (variables)
-- **Markdown:** marked.js + KaTeX for math rendering
-- **Security:** DOMPurify for XSS protection
-- **Icons:** Font Awesome 6
-- **Fonts:** Google Fonts (Inter + Lora)
+**Papers not loading?** Make sure the server is running (`node server.js`) and you're accessing `http://localhost:3000`, not opening the HTML file directly.
+
+**Can't log in?** Check your password in `.env`. If you've failed 5 times, wait 15 minutes or restart the server.
+
+**Styles look wrong?** Hard refresh with Ctrl+Shift+R. If you edited SCSS, run `npm run scss`.
+
+**Math not rendering?** KaTeX loads from CDN — you need internet. Use `$...$` for inline, `$$...$$` for display.
+
+---
+
+## Tech Stack
+
+| Layer             | Technology                 |
+| ----------------- | -------------------------- |
+| Server            | Express 5, Node.js         |
+| Auth              | bcrypt, in-memory sessions |
+| Security          | Helmet, CORS, DOMPurify    |
+| Markdown          | marked.js                  |
+| Math              | KaTeX                      |
+| Code highlighting | highlight.js 11.9.0        |
+| Styles            | SCSS (sass CLI)            |
+| Fonts             | Inter + Lora + Fira Code   |
+| Icons             | Font Awesome 6             |
 
 ### Dependencies
 
-```json
-{
-  "dotenv": "^16.3.1" // Only production dependency
-}
-```
+**Production:** express, bcrypt, helmet, cors, compression, cookie-parser, dotenv, gray-matter  
+**Dev:** sass, nodemon
 
 ---
 
-## 📖 Additional Resources
+## Docs
 
-- [Markdown Guide](https://www.markdownguide.org/)
-- [KaTeX Supported Functions](https://katex.org/docs/supported.html)
-- [Font Awesome Icons](https://fontawesome.com/icons)
-- [Node.js HTTP Module Docs](https://nodejs.org/api/http.html)
+See [`docs/`](docs/) for more:
 
----
-
-## 📄 License
-
-This project is open source. Feel free to use it for your own portfolio.
-
----
-
-## 📅 Version
-
-**Last Updated:** January 2026
-**Node.js Version:** 14+
+- [Getting Started](docs/GETTING_STARTED.md)
+- [Admin Guide](docs/ADMIN_GUIDE.md)
+- [Features](docs/FEATURES.md)
+- [Shortcuts](docs/SHORTCUTS.md)
+- [API Reference](docs/API.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Changelog](docs/CHANGELOG.md)
 
 ---
 
-_Built with ☕ and academic dedication_
+**Version:** 4.2.0 · **Node.js:** 18+ · **License:** Open source

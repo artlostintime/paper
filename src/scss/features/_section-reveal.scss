@@ -1,0 +1,47 @@
+@use "../abstracts" as *;
+
+/* ── Section Reveal Animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chapters start hidden, animate on intersection */
+.chapter {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity $ease-slow,
+    transform $ease-slow;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional stagger for child elements */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity $ease-normal,
+    transform $ease-normal;
+
+  @for $i from 1 through $stagger-count {
+    &:nth-child(#{$i}) {
+      transition-delay: #{($i - 1) * 0.07}s;
+    }
+  }
+
+  .visible > & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

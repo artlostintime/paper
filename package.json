@@ -1,6 +1,25 @@
 {
+  "name": "psychology-portfolio",
+  "version": "4.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "scss": "sass src/scss/main.scss:public/css/main.css src/scss/admin.scss:public/admin/admin.css",
+    "scss:watch": "sass --watch src/scss/main.scss:public/css/main.css src/scss/admin.scss:public/admin/admin.css",
+    "build": "sass --style=compressed --no-source-map src/scss/main.scss:public/css/main.css src/scss/admin.scss:public/admin/admin.css"
+  },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.3",
-    "gray-matter": "^4.0.3"
+    "express": "^5.2.1",
+    "gray-matter": "^4.0.3",
+    "helmet": "^8.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "sass": "^1.97.3"
   }
 }
