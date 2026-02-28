@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
@@ -882,6 +882,30 @@
         font-family: "Fira Code", "Courier New", monospace !important;
       }
 
+      /* Mobile Preview Toggle */
+      .mobile-preview-toggle {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: var(--accent, #6366f1);
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease;
+      }
+      .mobile-preview-toggle:hover {
+        transform: scale(1.1);
+      }
+
       /* Responsive */
       @media (max-width: 900px) {
         .admin-container {
@@ -898,6 +922,18 @@
         }
         .preview-pane {
           display: none;
+        }
+        .mobile-preview-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        /* When preview is active on mobile */
+        .editor-content.show-preview .editor-pane {
+          display: none;
+        }
+        .editor-content.show-preview .preview-pane {
+          display: block;
         }
       }
     </style>
@@ -1188,6 +1224,14 @@
           </div>
 
           <div class="editor-content" id="editor-content">
+            <!-- Mobile Preview Toggle -->
+            <button
+              class="mobile-preview-toggle"
+              id="mobile-preview-toggle"
+              title="Toggle Preview"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
             <div class="editor-pane">
               <div class="pane-header">
                 <div class="pane-header-left">
@@ -1299,58 +1343,7 @@ Tip: Use Ctrl+S to save, Ctrl+B for bold, Ctrl+I for italic"
     <!-- DOMPurify for XSS protection -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-    <!-- Inline Backup Login Handler (works even if script.js fails to load) -->
-    <script>
-      (function () {
-        var loginForm = document.getElementById("login-form");
-        if (loginForm && !loginForm._hasHandler) {
-          loginForm._hasHandler = true;
-          loginForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            var pwd = document.getElementById("login-password");
-            var err = document.getElementById("login-error");
-            var btn = loginForm.querySelector("button[type=submit]");
-
-            if (!pwd || !pwd.value) {
-              if (err) err.textContent = "Please enter password";
-              return;
-            }
-
-            if (btn) {
-              btn.disabled = true;
-              btn.innerHTML =
-                '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-            }
-
-            try {
-              var res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "same-origin",
-                body: JSON.stringify({ password: pwd.value }),
-              });
-              var data = await res.json();
-
-              if (data.success) {
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("admin-app").style.display = "block";
-                if (typeof loadPapers === "function") loadPapers();
-              } else {
-                if (err) err.textContent = data.error || "Invalid password";
-              }
-            } catch (ex) {
-              console.error("Login error:", ex);
-              if (err) err.textContent = "Connection error";
-            }
-
-            if (btn) {
-              btn.disabled = false;
-              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-            }
-          });
-        }
-      })();
-    </script>
+    <script src="/admin/backup-login.js"></script>
 
     <!-- Main Admin Script -->
     <script src="/admin/admin.js"></script>

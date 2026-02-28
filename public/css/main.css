@@ -48,6 +48,51 @@ html {
   scroll-behavior: smooth;
 }
 
+/* --- SKIP LINK (Accessibility) --- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  border-radius: 0 0 8px 8px;
+  z-index: 100000;
+  transition: top 0.2s;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* --- FOCUS STYLES (Accessibility) --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- REDUCED MOTION --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Paper grain texture overlay */
 body::before {
   content: "";
@@ -68,7 +113,9 @@ body {
   font-family: var(--font-serif);
   font-size: 17px;
   line-height: 1.85;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -83,7 +130,9 @@ span {
 a {
   color: var(--accent);
   text-decoration: none;
-  transition: color 0.2s, opacity 0.2s;
+  transition:
+    color 0.2s,
+    opacity 0.2s;
 }
 
 a:hover {
@@ -525,39 +574,6 @@ a:hover {
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(183, 75, 75, 0.3);
-}
-
-/* --- 13. TIMELINE --- */
-.timeline-list {
-  list-style: none;
-  border-left: 2px solid var(--line);
-  padding-left: 25px;
-  margin-left: 10px;
-}
-
-.timeline-list li {
-  position: relative;
-  margin-bottom: 25px;
-}
-
-.timeline-list li::before {
-  content: "";
-  position: absolute;
-  left: -32px;
-  top: 5px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--bg-body);
-  border: 2px solid var(--accent);
-}
-
-.year {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  color: var(--accent);
-  display: block;
-  margin-bottom: 3px;
 }
 
 /* --- 14. TECH LIST --- */
@@ -1052,215 +1068,6 @@ a:hover {
 }
 
 /* --- END OF STYLE.CSS --- */
-/* --- 13. TIMELINE (Creative Design) --- */
-.timeline-container {
-  max-height: 320px;
-  overflow-y: auto;
-  position: relative;
-  padding: 10px 0;
-
-  /* Hide scrollbar but keep functionality */
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.timeline-container::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* Fade effect at bottom to hint more content */
-.timeline-wrapper {
-  position: relative;
-}
-
-.timeline-wrapper::after {
-  content: "";
-  position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(transparent, var(--bg-body));
-  pointer-events: none;
-  z-index: 1;
-}
-
-.timeline-list {
-  list-style: none;
-  position: relative;
-  padding-left: 0;
-  margin-left: 0;
-}
-
-/* The vertical line */
-.timeline-list::before {
-  content: "";
-  position: absolute;
-  left: 24px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    var(--accent),
-    var(--line) 20%,
-    var(--line) 80%,
-    transparent
-  );
-}
-
-.timeline-list li {
-  position: relative;
-  padding-left: 70px;
-  padding-bottom: 30px;
-  opacity: 0;
-  transform: translateX(-20px);
-  animation: fadeInTimeline 0.5s ease forwards;
-}
-
-.timeline-list li:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.timeline-list li:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.timeline-list li:nth-child(3) {
-  animation-delay: 0.3s;
-}
-.timeline-list li:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.timeline-list li:nth-child(5) {
-  animation-delay: 0.5s;
-}
-.timeline-list li:nth-child(6) {
-  animation-delay: 0.6s;
-}
-
-@keyframes fadeInTimeline {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.timeline-list li:last-child {
-  padding-bottom: 10px;
-}
-
-/* The dot/node */
-.timeline-list li::before {
-  content: "";
-  position: absolute;
-  left: 16px;
-  top: 4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--bg-body);
-  border: 3px solid var(--accent);
-  box-shadow: 0 0 0 4px var(--bg-body), 0 0 15px rgba(183, 75, 75, 0.3);
-  transition: all 0.3s ease;
-  z-index: 2;
-}
-
-.timeline-list li:hover::before {
-  transform: scale(1.3);
-  box-shadow: 0 0 0 4px var(--bg-body), 0 0 25px rgba(183, 75, 75, 0.5);
-}
-
-/* Inner glow dot */
-.timeline-list li::after {
-  content: "";
-  position: absolute;
-  left: 22px;
-  top: 10px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  z-index: 3;
-  transition: all 0.3s ease;
-}
-
-.timeline-list li:hover::after {
-  background: var(--accent-hover);
-}
-
-/* Year badge */
-.year {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--bg-card);
-  border: 1px solid var(--accent);
-  padding: 3px 10px;
-  border-radius: 20px;
-  display: inline-block;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
-}
-
-.timeline-list li:hover .year {
-  background: var(--accent);
-  color: white;
-}
-
-/* Event text */
-.timeline-list li p {
-  color: var(--text-light);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0;
-  transition: color 0.3s ease;
-}
-
-.timeline-list li:hover p {
-  color: var(--text-main);
-}
-
-/* Scroll hint */
-.timeline-hint {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  opacity: 0.6;
-  transition: opacity 0.3s;
-}
-
-.timeline-hint:hover {
-  opacity: 1;
-}
-
-.timeline-hint i {
-  animation: bounceDown 1.5s ease infinite;
-}
-
-@keyframes bounceDown {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(5px);
-  }
-}
-
-/* Hide hint when scrolled to bottom */
-.timeline-hint.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* --- END OF TIMELINE STYLES --- */
 /* --- 13. TIMELINE (Creative Design with Drag Scroll) --- */
 .timeline-wrapper {
   position: relative;
@@ -1379,14 +1186,18 @@ a:hover {
   border-radius: 50%;
   background: var(--bg-body);
   border: 3px solid var(--accent);
-  box-shadow: 0 0 0 4px var(--bg-body), 0 0 15px rgba(183, 75, 75, 0.3);
+  box-shadow:
+    0 0 0 4px var(--bg-body),
+    0 0 15px rgba(183, 75, 75, 0.3);
   transition: all 0.3s ease;
   z-index: 2;
 }
 
 .timeline-list li:hover::before {
   transform: scale(1.3);
-  box-shadow: 0 0 0 4px var(--bg-body), 0 0 25px rgba(183, 75, 75, 0.5);
+  box-shadow:
+    0 0 0 4px var(--bg-body),
+    0 0 25px rgba(183, 75, 75, 0.5);
 }
 
 /* Inner glow dot */
@@ -1787,7 +1598,9 @@ a:hover {
 .chapter {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
 }
 
 .chapter.visible {
@@ -1998,7 +1811,9 @@ a:hover {
 .section-divider {
   opacity: 0;
   transform: scaleX(0);
-  transition: opacity 0.6s ease, transform 0.8s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.8s ease;
 }
 
 .section-divider.visible {
@@ -2032,12 +1847,16 @@ a:hover {
   padding: 2rem;
   margin-bottom: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 1px 2px var(--shadow), 0 4px 12px transparent;
+  box-shadow:
+    0 1px 2px var(--shadow),
+    0 4px 12px transparent;
 }
 
 .paper-entry:hover {
   border-color: var(--accent);
-  box-shadow: 0 2px 4px var(--shadow), 0 8px 24px var(--shadow);
+  box-shadow:
+    0 2px 4px var(--shadow),
+    0 8px 24px var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -2110,7 +1929,9 @@ a:hover {
 /* Timeline refinements */
 .timeline-list li::before {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--bg-body), 0 0 12px rgba(201, 120, 93, 0.2);
+  box-shadow:
+    0 0 0 4px var(--bg-body),
+    0 0 12px rgba(201, 120, 93, 0.2);
 }
 
 .year {
@@ -2271,4 +2092,195 @@ a:hover {
   color: var(--text-light);
   font-size: 1.15rem;
   line-height: 1.9;
+}
+
+/* ================================================
+   HERO / INTRO SECTION
+   ================================================ */
+.hero-section {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.scroll-cue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2.5rem;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.scroll-cue:hover {
+  opacity: 1;
+}
+
+.scroll-cue i {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* ================================================
+   SEARCH KEYBOARD HINT
+   ================================================ */
+.search-hint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  background: var(--line-light);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* Hide hint when input has focus or content */
+.search-container input:focus ~ .search-hint,
+.search-container input:not(:placeholder-shown) ~ .search-hint {
+  opacity: 0;
+}
+
+/* ================================================
+   PAPER CARD MICRO-INTERACTIONS
+   ================================================ */
+.paper-entry {
+  position: relative;
+  overflow: hidden;
+}
+
+.paper-entry::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+.paper-entry:hover::before {
+  transform: scaleY(1);
+  transform-origin: top;
+}
+
+/* Staggered entrance for paper cards */
+.paper-entry {
+  animation: slideInCard 0.4s ease both;
+}
+
+.paper-entry:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.paper-entry:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.paper-entry:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.paper-entry:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.paper-entry:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.paper-entry:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+@keyframes slideInCard {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================================
+   FOOTER
+   ================================================ */
+.site-footer {
+  padding: 2.5rem 30px;
+  text-align: center;
+  border-top: 1px solid var(--line-light);
+  margin-top: 2rem;
+}
+
+.footer-inner {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-name {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.footer-sep {
+  opacity: 0.4;
+}
+
+.footer-note {
+  font-style: italic;
+}
+
+/* ================================================
+   IMPROVED EMPTY STATE
+   ================================================ */
+.no-results {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.no-results::before {
+  content: "\\f002";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  display: block;
+  font-size: 2.5rem;
+  opacity: 0.2;
+  margin-bottom: 1rem;
+}
+
+/* ================================================
+   PAPER COUNT TRANSITION
+   ================================================ */
+.paper-count {
+  transition: opacity 0.2s;
+}
+
+.paper-count:empty {
+  opacity: 0;
 }

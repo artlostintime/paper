@@ -76,6 +76,12 @@ if (backToTopBtn) {
     } else {
       backToTopBtn.classList.remove("visible");
     }
+
+    // Fade out scroll cue in hero after scrolling
+    const scrollCue = document.querySelector(".scroll-cue");
+    if (scrollCue) {
+      scrollCue.style.opacity = window.scrollY > 120 ? "0" : "";
+    }
   });
 
   backToTopBtn.addEventListener("click", () => {
@@ -149,50 +155,14 @@ const ITEMS_INITIAL = 4;
 const ITEMS_PER_PAGE = 10;
 const RECENT_DAYS = 7; // Papers modified within X days are marked "recent"
 
-// Category mapping based on filename
-const CATEGORY_MAP = {
-  clinical: {
-    icon: "fa-user-md",
-    label: "Clinical",
-    files: ["anxiety", "depression", "psychothearapy", "trauma"],
-  },
-  cognitive: {
-    icon: "fa-brain",
-    label: "Cognitive",
-    files: ["cognition", "memory"],
-  },
-  social: {
-    icon: "fa-users",
-    label: "Social",
-    files: ["social", "attachment"],
-  },
-  health: {
-    icon: "fa-heartbeat",
-    label: "Health",
-    files: ["burnout", "sleep", "addiction"],
-  },
-  developmental: {
-    icon: "fa-child",
-    label: "Developmental",
-    files: ["developmental"],
-  },
-  neuroscience: {
-    icon: "fa-dna",
-    label: "Neuroscience",
-    files: ["neuroscience"],
-  },
-  personality: {
-    icon: "fa-fingerprint",
-    label: "Personality",
-    files: ["personality", "motivition"],
-  },
-};
+// Category map — loaded from server (single source of truth)
+let CATEGORY_MAP = {};
 
 // State
 let paperFiles = [];
 let paperMetadata = {}; // Store file metadata (mtime, category)
 let filteredPapers = [];
-let paperContents = {}; // Cache for search
+let paperContents = {}; // Cache for rendering (populated on-demand)
 let isFullView = false;
 let currentPage = 1;
 let searchQuery = "";
@@ -277,23 +247,29 @@ function buildCategoryFilter() {
   });
 }
 
-// Apply both search and category filters
-function applyFilters() {
-  filteredPapers = paperFiles.filter((filename) => {
-    // Category filter
-    if (activeCategory !== "all") {
-      const cat = getCategory(filename);
-      if (cat.key !== activeCategory) return false;
-    }
+// Apply both search and category filters (uses server-side search)
+async function applyFilters() {
+  // If we have a search query or category filter, use the server-side search API
+  if (searchQuery || activeCategory !== "all") {
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set("q", searchQuery);
+      if (activeCategory !== "all") params.set("category", activeCategory);
 
-    // Search filter
-    if (searchQuery) {
-      const content = paperContents[filename] || "";
-      if (!content.toLowerCase().includes(searchQuery)) return false;
+      const response = await fetch(`/api/papers/search?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        filteredPapers = data.files || [];
+      } else {
+        filteredPapers = [];
+      }
+    } catch (e) {
+      console.error("Search error:", e);
+      filteredPapers = [];
     }
-
-    return true;
-  });
+  } else {
+    filteredPapers = [...paperFiles];
+  }
 
   currentPage = 1;
   updateDisplay(false);
@@ -307,7 +283,17 @@ async function loadPaperList() {
   if (skeletonLoader) skeletonLoader.style.display = "block";
 
   try {
-    const response = await fetch("/api/papers");
+    // Load category map from server (single source of truth)
+    if (Object.keys(CATEGORY_MAP).length === 0) {
+      try {
+        const catRes = await fetch("/api/categories");
+        if (catRes.ok) CATEGORY_MAP = await catRes.json();
+      } catch (e) {
+        console.warn("Could not load categories, using defaults");
+      }
+    }
+
+    const response = await fetch('/api/papers');
     if (!response.ok) throw new Error("Could not fetch paper list");
     const data = await response.json();
 
@@ -320,9 +306,6 @@ async function loadPaperList() {
     }
 
     filteredPapers = [...paperFiles];
-
-    // Pre-fetch all paper contents for search
-    await prefetchPaperContents();
 
     // Build category filter
     buildCategoryFilter();
@@ -340,28 +323,15 @@ async function loadPaperList() {
           <i class="fas fa-exclamation-triangle"></i>
           <p>Could not load papers. Make sure the server is running:</p>
           <code>node server.js</code>
+          <button onclick="loadPaperList()" class="btn-text" style="margin-top:1rem;cursor:pointer">
+            <i class="fas fa-redo"></i> Retry
+          </button>
         </div>`;
     }
   }
 }
 
-// Pre-fetch paper contents for search functionality
-async function prefetchPaperContents() {
-  const fetchPromises = paperFiles.map(async (filename) => {
-    try {
-      const response = await fetch(`/api/papers/${filename}`);
-      if (response.ok) {
-        const data = await response.json();
-        paperContents[filename] = data.content;
-      }
-    } catch (e) {
-      console.error(`Failed to prefetch ${filename}`);
-    }
-  });
-  await Promise.all(fetchPromises);
-}
-
-// Search/filter papers
+// Search/filter papers (now uses server-side search)
 function filterPapers(query) {
   searchQuery = query.toLowerCase().trim();
   applyFilters();
@@ -401,9 +371,27 @@ async function renderPapers(filesToRender) {
     if (noResultsEl) noResultsEl.style.display = "none";
   }
 
+  // Batch-fetch uncached papers in one request
+  const uncached = filesToRender.filter((f) => !paperContents[f]);
+  if (uncached.length > 0) {
+    try {
+      const batchRes = await fetch(
+        `/api/papers/batch?files=${uncached.join(",")}`,
+      );
+      if (batchRes.ok) {
+        const batchData = await batchRes.json();
+        for (const [file, data] of Object.entries(batchData)) {
+          paperContents[file] = data.content;
+        }
+      }
+    } catch (e) {
+      console.warn("Batch fetch failed, falling back to individual requests");
+    }
+  }
+
   for (const filename of filesToRender) {
     try {
-      // Use cached content if available
+      // Use cached content if available, otherwise fetch individually
       let markdownText = paperContents[filename];
       if (!markdownText) {
         const response = await fetch(`/api/papers/${filename}`);
@@ -470,7 +458,7 @@ async function renderPapers(filesToRender) {
       if (title) {
         const titleText = title.innerHTML;
         title.innerHTML = `<a href="paper.html?file=${encodeURIComponent(
-          filename
+          filename,
         )}" class="paper-title-link">${titleText}</a>`;
       }
 
@@ -635,7 +623,7 @@ function renderPaginationControls(totalPages) {
     }
 
     paginationContainer.appendChild(
-      createBtn("Last", totalPages, currentPage === totalPages)
+      createBtn("Last", totalPages, currentPage === totalPages),
     );
   }
 }
@@ -726,7 +714,7 @@ if (timelineContainer) {
       touchStartY = e.touches[0].pageY - timelineContainer.offsetTop;
       touchScrollTop = timelineContainer.scrollTop;
     },
-    { passive: true }
+    { passive: true },
   );
 
   timelineContainer.addEventListener(
@@ -736,7 +724,7 @@ if (timelineContainer) {
       const walk = (y - touchStartY) * 1.5;
       timelineContainer.scrollTop = touchScrollTop - walk;
     },
-    { passive: true }
+    { passive: true },
   );
 
   // Hide hint when scrolled to bottom
@@ -772,4 +760,11 @@ if (copyEmailBtn) {
       });
     }
   });
+}
+
+// --- DYNAMIC FOOTER YEAR ---
+const footerYear = document.getElementById('footer-year');
+if (footerYear) {
+  const currentYear = new Date().getFullYear();
+  footerYear.innerHTML = `\u00A9 2024\u2013${currentYear}`;
 }

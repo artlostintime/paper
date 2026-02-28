@@ -1,5 +1,143 @@
 # 📝 Changelog
 
+## [3.0.0] - March 1, 2026
+
+### 🔒 Security
+
+#### Path Traversal Prevention
+
+- Added strict `VALID_FILENAME` regex (`/^[\w-]+\.md$/`) on all file API routes
+- Blocks directory traversal attacks (`../../etc/passwd` etc.)
+
+#### Content Security Policy
+
+- Replaced disabled CSP (`contentSecurityPolicy: false`) with full directive set
+- Whitelisted only required CDN sources (fonts.googleapis, cdn.jsdelivr, cdnjs.cloudflare)
+
+#### CSRF Protection
+
+- Added origin/referer validation middleware for all POST requests
+- Allows same-origin requests; blocks cross-origin state-changing calls
+
+#### Request Limits
+
+- `express.json()` now enforced with `{ limit: "1mb" }` to prevent payload abuse
+
+### 🚀 Performance
+
+#### Gzip Compression
+
+- Added `compression` middleware — all responses are now gzip-compressed
+
+#### Async I/O
+
+- Replaced all `fs.readFileSync` / `fs.readdirSync` with `fs.promises` equivalents
+- Server no longer blocks the event loop during file operations
+
+#### In-Memory Search Index
+
+- Search queries now hit an in-memory `Map` instead of reading every file from disk
+- Index auto-invalidates on save/delete operations
+
+#### Batch API
+
+- New `GET /api/papers/batch?files=a.md,b.md` endpoint
+- Frontend fetches all visible papers in a single request (resolves N+1 problem)
+
+#### Static File Caching
+
+- `express.static` now serves with `maxAge: "1d"` headers
+
+### 🎉 New Features
+
+#### Categories API
+
+- New `GET /api/categories` endpoint serves category map as single source of truth
+- Frontend loads categories from server instead of maintaining a duplicate map
+
+#### Sorting
+
+- `GET /api/papers` now accepts `?sort=date|name|category` query parameter
+- Papers sortable by modification date, alphabetical name, or category grouping
+
+#### 404 Error Pages
+
+- API routes return structured JSON `{ error: "Not found" }`
+- Non-API routes return a themed HTML page with navigation back to home
+
+#### Global Error Handler
+
+- Unhandled exceptions caught gracefully with stack traces in development
+
+#### Admin Mobile Preview Toggle
+
+- Floating button on mobile to switch between editor and preview panes
+- Toggles icon between eye (preview) and code (editor) states
+
+### ✨ UI/UX Improvements
+
+#### Hero Intro Section
+
+- Introduction section now uses `min-height: 70vh` centered layout
+- Added "Scroll to explore" cue with animated chevron (fades on scroll)
+
+#### Paper Card Micro-Interactions
+
+- Staggered entrance animation — cards slide in sequentially
+- Accent-colored left border scales up on hover
+
+#### Search Bar Enhancement
+
+- Keyboard hint badge (`/`) shown inside the search input
+- Hint fades when the input is focused or has content
+
+#### Footer
+
+- Added minimal site footer with name, copyright range, and tagline
+- Page no longer ends abruptly after the last section
+
+#### Better Empty States
+
+- "No results" message now displays a search icon above the text
+
+#### Paper Count Transition
+
+- Count text fades in smoothly instead of appearing instantly
+
+### ♿ Accessibility
+
+- Added skip-to-content link (visible on keyboard focus)
+- Added `:focus-visible` outlines on all interactive elements
+- Added `prefers-reduced-motion` media query — all animations instantly resolve for users who prefer reduced motion
+
+### 🐛 Bug Fixes
+
+#### Category Typos
+
+- Fixed `psychothearapy` → `psychotherapy` in category map
+- Fixed `motivition` → `motivation` in category map
+
+#### Placeholder Links
+
+- Replaced `yourusername` social links with actual profile URLs + TODO comments
+
+### 🧹 Code Cleanup
+
+- Removed ~180 lines of duplicate timeline CSS (was defined twice in main.css)
+- Removed dead sort-controls CSS and responsive rules after feature removal
+- Consolidated category map — single source on server, no frontend duplicate
+- Sort controls feature added then removed per user request (CSS fully cleaned)
+
+### 📦 Dependencies
+
+- Added `compression` package for gzip middleware
+
+### 📄 Configuration
+
+- Updated `.env.example` with HTTPS fields (`HTTPS_PORT`, `USE_HTTPS`, `SSL_KEY_PATH`, `SSL_CERT_PATH`)
+
+---
+
 ## [2.1.0] - January 2, 2026
 
 ### 🎉 New Features

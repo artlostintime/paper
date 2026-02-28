@@ -1,5 +1,4 @@
 // ============== ADMIN PANEL - CLEAN REBUILD ==============
-console.log("script.js loaded!");
 
 // Wait for DOM to be ready
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fontDecrease = document.getElementById("font-decrease");
   const distractionFree = document.getElementById("distraction-free");
   const yamlBtn = document.getElementById("yaml-btn");
+  const mobilePreviewToggle = document.getElementById("mobile-preview-toggle");
 
   // ============== STATE ==============
   let papers = [];
@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let editorFontSize = 14; // Default font size in pixels
   let currentTheme = localStorage.getItem("adminTheme") || "dark";
+  let mobilePreviewActive = false;
 
   // Warn before leaving with unsaved changes
   window.addEventListener("beforeunload", (e) => {
@@ -132,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isActive
           ? "Distraction-free mode enabled"
           : "Distraction-free mode disabled",
-        "info"
+        "info",
       );
     }
   }
@@ -303,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const filtered = searchQuery
       ? papers.filter((p) =>
-          p.toLowerCase().includes(searchQuery.toLowerCase())
+          p.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : papers;
 
@@ -330,10 +331,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }" data-file="${filename}">
         <div class="paper-item-info">
           <h3>${filename.replace(".md", "").replace(/-/g, " ")}${
-          isRecent
-            ? ' <span class="recent-badge" title="Modified recently">🔥</span>'
-            : ""
-        }</h3>
+            isRecent
+              ? ' <span class="recent-badge" title="Modified recently">🔥</span>'
+              : ""
+          }</h3>
           <p><i class="fas fa-file-alt"></i> ${filename}</p>
         </div>
         <div class="paper-item-actions">
@@ -1119,6 +1120,22 @@ Author, A. A., & Author, B. B. (Year). Title of article. *Journal Name*, Volume(
       }
     });
 
+    // Mobile preview toggle
+    if (mobilePreviewToggle) {
+      mobilePreviewToggle.addEventListener("click", () => {
+        mobilePreviewActive = !mobilePreviewActive;
+        editorContent.classList.toggle("show-preview", mobilePreviewActive);
+        const icon = mobilePreviewToggle.querySelector("i");
+        if (icon) {
+          icon.classList.toggle("fa-eye", !mobilePreviewActive);
+          icon.classList.toggle("fa-code", mobilePreviewActive);
+        }
+        mobilePreviewToggle.title = mobilePreviewActive
+          ? "Show Editor"
+          : "Toggle Preview";
+      });
+    }
+
     // Restore sidebar state
     try {
       if (localStorage.getItem("sidebarCollapsed") === "true") {
@@ -1396,7 +1413,7 @@ ${html}
   // Quick insert buttons
   document.querySelectorAll(".quick-insert button").forEach((btn) => {
     btn.addEventListener("click", () =>
-      insertAtCursor(btn.dataset.quick || "")
+      insertAtCursor(btn.dataset.quick || ""),
     );
   });
 
@@ -1422,19 +1439,19 @@ ${html}
   // Shortcuts modal
   if (shortcutsBtn && shortcutsModal) {
     shortcutsBtn.addEventListener("click", () =>
-      shortcutsModal.classList.add("show")
+      shortcutsModal.classList.add("show"),
     );
   }
   if (closeShortcuts && shortcutsModal) {
     closeShortcuts.addEventListener("click", () =>
-      shortcutsModal.classList.remove("show")
+      shortcutsModal.classList.remove("show"),
     );
   }
 
   // Delete modal
   if (cancelDelete && deleteModal) {
     cancelDelete.addEventListener("click", () =>
-      deleteModal.classList.remove("show")
+      deleteModal.classList.remove("show"),
     );
   }
   if (confirmDelete && deleteModal) {

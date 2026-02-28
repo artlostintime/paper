@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
@@ -76,7 +76,9 @@
         align-items: center;
         justify-content: center;
         z-index: 10000;
-        transition: opacity 0.5s, visibility 0.5s;
+        transition:
+          opacity 0.5s,
+          visibility 0.5s;
       }
       .page-loader.hidden {
         opacity: 0;
@@ -107,6 +109,9 @@
     </style>
   </head>
   <body>
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
     <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
       <div class="loader-content">
@@ -149,7 +154,7 @@
     </nav>
 
     <main id="main-content">
-      <section id="intro" class="chapter">
+      <section id="intro" class="chapter hero-section">
         <span class="chapter-number">Chapter 01</span>
         <h2 class="chapter-title">Introduction</h2>
         <p class="lead-text">
@@ -168,6 +173,10 @@
           side, technical experiments on the other. Sometimes they intersect in
           unexpected ways.
         </p>
+        <div class="scroll-cue">
+          <span>Scroll to explore</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
       </section>
 
       <hr class="section-divider" />
@@ -185,6 +194,7 @@
             placeholder="Search papers..."
             aria-label="Search papers"
           />
+          <kbd class="search-hint" id="search-hint">/</kbd>
           <button id="clear-search" class="clear-search" style="display: none">
             <i class="fas fa-times"></i>
           </button>
@@ -335,8 +345,9 @@
           </div>
         </div>
 
+        <!-- TODO: Replace with your actual GitHub URL -->
         <a
-          href="https://github.com/yourusername"
+          href="https://github.com/vishu-singh6"
           target="_blank"
           class="github-link"
         >
@@ -363,15 +374,16 @@
 
           <div class="email-box">
             <i class="fas fa-envelope"></i>
-            <span class="email-text">vsingh6.23@stu.aud.ac.in </span>
+            <span class="email-text">vsingh6.23@stu.aud.ac.in</span>
             <button id="copy-email" class="copy-btn" title="Copy email">
               <i class="fas fa-copy"></i>
             </button>
           </div>
 
           <div class="social-links">
+            <!-- TODO: Replace with your actual profile URLs -->
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/vishu-singh6"
               target="_blank"
               class="social-icon"
               title="GitHub"
@@ -379,7 +391,7 @@
               <i class="fab fa-github"></i>
             </a>
             <a
-              href="https://linkedin.com/in/yourusername"
+              href="https://linkedin.com/in/vishu-singh6"
               target="_blank"
               class="social-icon"
               title="LinkedIn"
@@ -387,20 +399,12 @@
               <i class="fab fa-linkedin-in"></i>
             </a>
             <a
-              href="https://twitter.com/yourusername"
+              href="https://twitter.com/vishu_singh6"
               target="_blank"
               class="social-icon"
               title="Twitter"
             >
               <i class="fab fa-twitter"></i>
-            </a>
-            <a
-              href="https://orcid.org/0000-0000-0000-0000"
-              target="_blank"
-              class="social-icon"
-              title="ORCID"
-            >
-              <i class="fab fa-orcid"></i>
             </a>
           </div>
 
@@ -427,6 +431,17 @@
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
       <i class="fas fa-arrow-up"></i>
     </button>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span class="footer-name">Vishu</span>
+        <span class="footer-sep">&middot;</span>
+        <span class="footer-copy" id="footer-year"></span>
+        <span class="footer-sep">&middot;</span>
+        <span class="footer-note">Built with curiosity</span>
+      </div>
+    </footer>
 
     <script src="js/main.js"></script>
   </body>
